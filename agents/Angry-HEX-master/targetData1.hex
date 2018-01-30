@@ -1,0 +1,70 @@
+birdType(redbird).
+velocity("1.005").
+slingshot(183, 319, 21, 65).
+rectangle(0, pig, 543, 296, 14, 10, "0.000000").
+boundingBox(0, pig, 543, 296, 14, 10, "0.000000").
+rectangle(1, wood, 491, 360, 6, 13, "0.000000").
+boundingBox(1, wood, 491, 360, 6, 13, "0.000000").
+rectangle(2, wood, 520, 341, 6, 53, "0.000000").
+boundingBox(2, wood, 520, 341, 6, 53, "0.000000").
+rectangle(3, wood, 544, 312, 7, 53, "-1.570796").
+boundingBox(3, wood, 544, 312, 7, 53, "-1.570796").
+rectangle(4, wood, 532, 283, 6, 53, "0.000000").
+boundingBox(4, wood, 532, 283, 6, 53, "0.000000").
+rectangle(5, wood, 544, 362, 6, 27, "-1.570796").
+boundingBox(5, wood, 544, 362, 6, 27, "-1.570796").
+rectangle(6, wood, 544, 330, 6, 26, "-1.570796").
+boundingBox(6, wood, 544, 330, 6, 26, "-1.570796").
+rectangle(7, ice, 535, 346, 6, 26, "0.000000").
+boundingBox(7, ice, 535, 346, 6, 26, "0.000000").
+rectangle(8, wood, 545, 254, 7, 26, "-1.570796").
+boundingBox(8, wood, 545, 254, 7, 26, "-1.570796").
+rectangle(9, wood, 544, 304, 6, 12, "-1.570796").
+boundingBox(9, wood, 544, 304, 6, 12, "-1.570796").
+rectangle(10, stone, 545, 244, 12, 13, "0.000000").
+boundingBox(10, stone, 545, 244, 12, 13, "0.000000").
+rectangle(11, wood, 545, 231, 6, 13, "0.000000").
+boundingBox(11, wood, 545, 231, 6, 13, "0.000000").
+rectangle(12, ice, 553, 346, 5, 26, "0.000000").
+boundingBox(12, ice, 553, 346, 5, 26, "0.000000").
+rectangle(13, wood, 557, 283, 6, 53, "0.000000").
+boundingBox(13, wood, 557, 283, 6, 53, "0.000000").
+rectangle(14, wood, 566, 341, 6, 53, "0.000000").
+boundingBox(14, wood, 566, 341, 6, 53, "0.000000").
+rectangle(15, wood, 595, 360, 6, 13, "0.000000").
+boundingBox(15, wood, 595, 360, 6, 13, "0.000000").
+birdType(redbird).
+velocity("1.005").
+slingshot(183, 319, 21, 65).
+rectangle(0, pig, 543, 296, 14, 10, "0.000000").
+boundingBox(0, pig, 543, 296, 14, 10, "0.000000").
+rectangle(1, wood, 491, 360, 6, 13, "0.000000").
+boundingBox(1, wood, 491, 360, 6, 13, "0.000000").
+rectangle(2, wood, 520, 341, 6, 53, "0.000000").
+boundingBox(2, wood, 520, 341, 6, 53, "0.000000").
+rectangle(3, wood, 544, 312, 7, 53, "-1.570796").
+boundingBox(3, wood, 544, 312, 7, 53, "-1.570796").
+rectangle(4, wood, 532, 283, 6, 53, "0.000000").
+boundingBox(4, wood, 532, 283, 6, 53, "0.000000").
+rectangle(5, wood, 544, 362, 6, 27, "-1.570796").
+boundingBox(5, wood, 544, 362, 6, 27, "-1.570796").
+rectangle(6, wood, 544, 330, 6, 26, "-1.570796").
+boundingBox(6, wood, 544, 330, 6, 26, "-1.570796").
+rectangle(7, ice, 535, 346, 6, 26, "0.000000").
+boundingBox(7, ice, 535, 346, 6, 26, "0.000000").
+rectangle(8, wood, 545, 254, 7, 26, "-1.570796").
+boundingBox(8, wood, 545, 254, 7, 26, "-1.570796").
+rectangle(9, wood, 544, 304, 6, 12, "-1.570796").
+boundingBox(9, wood, 544, 304, 6, 12, "-1.570796").
+rectangle(10, stone, 545, 244, 12, 13, "0.000000").
+boundingBox(10, stone, 545, 244, 12, 13, "0.000000").
+rectangle(11, wood, 545, 231, 6, 13, "0.000000").
+boundingBox(11, wood, 545, 231, 6, 13, "0.000000").
+rectangle(12, ice, 553, 346, 5, 26, "0.000000").
+boundingBox(12, ice, 553, 346, 5, 26, "0.000000").
+rectangle(13, wood, 557, 283, 6, 53, "0.000000").
+boundingBox(13, wood, 557, 283, 6, 53, "0.000000").
+rectangle(14, wood, 566, 341, 6, 53, "0.000000").
+boundingBox(14, wood, 566, 341, 6, 53, "0.000000").
+rectangle(15, wood, 595, 360, 6, 13, "0.000000").
+boundingBox(15, wood, 595, 360, 6, 13, "0.000000").

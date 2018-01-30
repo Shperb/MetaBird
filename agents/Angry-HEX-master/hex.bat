@@ -1,0 +1,1 @@
+java -jar hex.jar -nasc

@@ -1,0 +1,12 @@
+NetBeans 8.0.2 was used to build the IHSEV 2014 AIBirds agent.
+
+Instructions:
+- Download the NetBeans 8.0.2 IDE <https://netbeans.org/>
+- Launch the IDE and open the project file located at: src/ab/nbbuild.xml
+- Compile and run IHSEV.jar with: java -jar IHSEV.jar
+
+Binaries:
+- This distribution also includes binaries for:
+    * the server (bin/ABServer.jar),
+    * the original agent (bin/ABSoftware.jar)
+    * the IHSEV agent (bin/IHSEV.jar)
