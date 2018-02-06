@@ -145,7 +145,7 @@ public abstract class MetaAgent {
 	}
 
 	private boolean isShotMessage(byte[] pMessage) {
-		return Constants.shotsMessages.contains(getMessageType(pMessage));
+		return pMessage !=null && Constants.shotsMessages.contains(getMessageType(pMessage));
 	}
 
 	public void actBeforeServerResponse(byte[] pMessage) throws IOException {
