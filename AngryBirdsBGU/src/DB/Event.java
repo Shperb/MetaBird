@@ -2,8 +2,8 @@ package DB;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
+import Clock.Clock;
 import MetaAgent.MyLogger;
 
 public class Event {
@@ -11,13 +11,11 @@ public class Event {
 	String endTime = null;
 	
 	public Event() {
-		Date date = new Date();
-		beginTime = getSimpleDateFormat().format(date);
+		beginTime = getSimpleDateFormat().format(Clock.getClock().getDate());
 	}
-	
+
 	public void setEndTime() {
-		Date date = new Date();
-		endTime = getSimpleDateFormat().format(date);
+		endTime = getSimpleDateFormat().format(Clock.getClock().getDate());
 	}
 	
 	SimpleDateFormat getSimpleDateFormat() {
@@ -26,7 +24,7 @@ public class Event {
 
 	public long getTimeElapsed() throws ParseException {
 		long begin = getSimpleDateFormat().parse(beginTime).getTime();
-		long now = new Date().getTime();
+		long now = Clock.getClock().getTime();
 		return (now - begin) / 1000;
 	}
 	

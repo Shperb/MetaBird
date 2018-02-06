@@ -3,7 +3,7 @@ package MetaAgent;
 import java.io.File;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 5;
+	private final int mSamplesPerPair = 10;
 
 	public MetaAgentDistributionSampling(int pTimeConstraint) {
 		super(pTimeConstraint);
@@ -18,10 +18,15 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 	protected String selectLevels() {
 		File folder = new File(Constants.levelsDir);
 		File[] listOfFiles = folder.listFiles();
+		
+		File[] shortListOfFiles = new File[20];
+		for (int i=0; i<20; i++) {
+			shortListOfFiles[i] = listOfFiles[i*20];
+		}
 
 		mLevels.clear();
-		for (int i = 0; i < listOfFiles.length && mLevels.size() < 8; i++) {
-			String level = listOfFiles[i].toPath().getFileName().toString().replace(".json", "");
+		for (int i = 0; i < shortListOfFiles.length && mLevels.size() < 8; i++) {
+			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
 			if (isRequired(level)) {
 				mLevels.put(level, mLevels.size() + 1);
 			}
@@ -39,6 +44,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		final String[] retVal = {null,null};
 		mLevels.keySet().forEach(level->{
 			getAgentsNames().forEach(agent->{
+				System.out.println(agent + ", " + level + " : " + getCount(agent, level));
 				if (getCount(agent, level) < mSamplesPerPair) {
 					retVal[0] = agent;
 					retVal[1] = level;
@@ -75,7 +81,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		int[] retVal = {0};
 		mData.games.forEach(game->{
 			game.levels.forEach(level->{
-				if (level.isFinished() && level.name == pLevel && level.agent == pAgent) {
+				if (level.isFinished() && level.name.equals(pLevel) && level.agent.equals(pAgent)) {
 					retVal[0] ++ ;
 				}
 			});

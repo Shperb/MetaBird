@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import Clock.Clock;
+import Clock.SystemClock;
 import DB.DBHandler;
 import DB.Data;
 import DB.Game;
@@ -44,9 +46,10 @@ public abstract class MetaAgent {
 	abstract protected String[] GetNewAgentAndLevel() throws Exception;
 
 	public MetaAgent(int pTimeConstraint) {
+		Clock.setClock(new SystemClock());
+		
 		mAgents.add(new Agent("planA", this));
 		mAgents.add(new Agent("naive", this));
-		// mAgents.add(new AgentBambird("BamBird_2016", this));
 		mAgents.add(new Agent("ihsev", this));
 		mAgents.add(new Agent("AngryBER", this));
 
@@ -164,10 +167,7 @@ public abstract class MetaAgent {
 			getShot().score = getScore(false);
 		}
 		
-		if (System.currentTimeMillis() % 10000 == 0) {
-			System.out.println("@state = " + getGameState());
-			MyLogger.log("@state = " + getGameState());
-		}
+		MyLogger.log("@state = " + getGameState());
 
 		GameState state;
 		if (notPlaying()) {

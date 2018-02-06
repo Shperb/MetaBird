@@ -14,7 +14,7 @@ public class MyConnectionToClient extends MyConnection {
 		Runtime.getRuntime().exec(dir + "/" + pExecutableFileName + ".bat", null, new File(dir));
 		System.out.println("Waiting for a client " + pExecutableFileName + " ...");
 		Socket socket = pServerSocket.accept();
-		socket.setSoTimeout(10000);
+		socket.setSoTimeout(20000);
 		System.out.println("Client accepted");
 		mInputStream = socket.getInputStream();
 		mOutputStream = socket.getOutputStream();

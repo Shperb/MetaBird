@@ -49,8 +49,8 @@ public class Proxy {
 		MyLogger.log("from client : " + ClientMessageTable.getValue(message[0]) + ". size: " + message.length + ". message: " + MyLogger.byteArrayPrefix(message, 100));
 //		System.out.println("from client : " + ClientMessageTable.getValue(message[0]) + ". size: " + message.length + ". message: " + MyLogger.byteArrayPrefix(message, 100));
 		boolean retVal = false;
-		if (message[0] == ClientMessageTable.getValue(ClientMessageTable.loadLevel)) {
-			MyLogger.log("Agent requests loading level " + message[1] + ". Ignoring.");
+		if (message[0] == ClientMessageTable.getValue(ClientMessageTable.loadLevel) || message[0] == ClientMessageTable.getValue(ClientMessageTable.restartLevel)) {
+			MyLogger.log("Agent requests loading\restarting level. Ignoring.");
 			getConnectionToClient().write(new byte[] {1});
 			mMetaAgent.getWorkingAgent().loadLevel();
 		}
