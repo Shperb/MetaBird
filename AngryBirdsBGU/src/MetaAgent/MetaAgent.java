@@ -28,7 +28,7 @@ import external.ClientMessageTable;
 
 public abstract class MetaAgent {
 
-	public GameState mLastGameState = GameState.MAIN_MENU;
+	// public GameState mLastGameState = GameState.MAIN_MENU;
 
 	protected Agent mWorkingAgent;
 	protected String mCurrentLevel;
@@ -47,11 +47,11 @@ public abstract class MetaAgent {
 
 	public MetaAgent(int pTimeConstraint) {
 		Clock.setClock(new SystemClock());
-		
+
 		mAgents.add(new Agent("planA", this));
 		mAgents.add(new Agent("naive", this));
-		mAgents.add(new Agent("ihsev", this));
 		mAgents.add(new Agent("AngryBER", this));
+		mAgents.add(new Agent("ihsev", this));
 
 		mTimeConstraint = pTimeConstraint;
 	}
@@ -102,7 +102,7 @@ public abstract class MetaAgent {
 
 	public void start() throws Exception {
 		mProxy = new Proxy();
-		mData = DBHandler.loadDate();
+		mData = DBHandler.loadData();
 		mProxy.setMetaAgent(this);
 		runAgents();
 		startNewGame();
@@ -111,7 +111,7 @@ public abstract class MetaAgent {
 
 	private void startNewGame() throws Exception {
 		MyLogger.log("starting new game");
-		mLastGameState = GameState.MAIN_MENU;
+		// mLastGameState = GameState.MAIN_MENU;
 		String message = Constants.newGameMessage + selectLevels();
 		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
 		byte[] configureResult = configure(Utils.intToByteArray(1000));
@@ -166,7 +166,7 @@ public abstract class MetaAgent {
 			getShot().setEndTime();
 			getShot().score = getScore(false);
 		}
-		
+
 		MyLogger.log("@state = " + getGameState());
 
 		GameState state;
@@ -189,26 +189,26 @@ public abstract class MetaAgent {
 				getLevel().state = LevelState.lost;
 			}
 		}
-		if (GameState.WON != mLastGameState && GameState.LOST != mLastGameState) {
-			if (GameState.WON == state || GameState.LOST == state) {
-				MyLogger.log("GameState: " + state.name());
-				if (GameState.WON == state) {
-					getLevel().score = getScore(true);
-				}
-				getLevel().setEndTime();
-				DBHandler.save(mData);
-				System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed()
-						+ ", getTimeConstraint(): " + getTimeConstraint());
-				MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
-						+ getTimeConstraint());
-				if (getGame().getTimeElapsed() > getTimeConstraint()) {
-					startNewGame();
-				} else {
-					chooseAgentAndLevel();
-				}
+		// if (GameState.WON != mLastGameState && GameState.LOST != mLastGameState) {
+		if (GameState.WON == state || GameState.LOST == state) {
+			MyLogger.log("GameState: " + state.name());
+			if (GameState.WON == state) {
+				getLevel().score = getScore(true);
+			}
+			getLevel().setEndTime();
+			DBHandler.save(mData);
+			System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
+					+ getTimeConstraint());
+			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
+					+ getTimeConstraint());
+			if (getGame().getTimeElapsed() > getTimeConstraint()) {
+				startNewGame();
+			} else {
+				chooseAgentAndLevel();
 			}
 		}
-		mLastGameState = state;
+		// }
+		// mLastGameState = state;
 	}
 
 	private boolean notPlaying() throws ParseException {
@@ -303,7 +303,6 @@ public abstract class MetaAgent {
 	}
 
 	GameState getGameState() throws IOException {
-		MyLogger.log("in");
 		GameState state = GameState.UNKNOWN;
 		try {
 			mProxy.mConnectionToServer.write(ClientMessageEncoder.getState());
@@ -330,7 +329,6 @@ public abstract class MetaAgent {
 			}
 			t.interrupt();
 		}
-		MyLogger.log("out");
 		return state;
 	}
 
@@ -352,10 +350,10 @@ public abstract class MetaAgent {
 				System.err.println("failed to load level " + level);
 			}
 			mLoadLevelTime = System.currentTimeMillis();
-		}
-		else {
+		} else {
 			MyLogger.log("for loading level " + pLevelName + ": state = " + state + " instead of " + GameState.PLAYING);
-			System.out.println("for loading level " + pLevelName + ": state = " + state + " instead of " + GameState.PLAYING);
+			System.out.println(
+					"for loading level " + pLevelName + ": state = " + state + " instead of " + GameState.PLAYING);
 			loadLevel(pLevelName, pAgent);
 		}
 	}

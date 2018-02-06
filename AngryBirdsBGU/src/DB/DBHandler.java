@@ -13,7 +13,7 @@ import com.google.gson.JsonSyntaxException;
 public class DBHandler {
 	private static Object lock = new Object();
 	
-	public static Data loadDate() throws JsonSyntaxException, IOException {
+	public static Data loadData() throws JsonSyntaxException, IOException {
 		if (getFile().exists()) {
 			String json = readFile(getFile().toPath(), StandardCharsets.UTF_8);
 			return new Gson().fromJson(json, Data.class);

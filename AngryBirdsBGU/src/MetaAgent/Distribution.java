@@ -2,7 +2,7 @@ package MetaAgent;
 import java.util.HashMap;
 
 public class Distribution {
-	HashMap<Integer, Integer> mTally = new HashMap<>();
+	public HashMap<Integer, Integer> mTally = new HashMap<>();
 	private int mTotalTally = 0;
 	
 	public void addTally(Integer pVal) {

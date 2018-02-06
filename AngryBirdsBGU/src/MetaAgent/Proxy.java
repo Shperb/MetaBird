@@ -1,6 +1,7 @@
 package MetaAgent;
 import java.io.IOException;
 
+import ab.vision.GameStateExtractor.GameState;
 import external.ClientMessageTable;
 
 public class Proxy {
@@ -31,11 +32,11 @@ public class Proxy {
 					MyLogger.log(e);
 					mMetaAgent.handleClientConnectionError();
 				}
-				if (deliverd) {
 					mMetaAgent.actBeforeServerResponse((byte[])(refMessage[0]));
-					deliverMessageFromServer();
+					if (deliverd) {
+						deliverMessageFromServer();
+					}
 					mMetaAgent.actAfterServerResponse((byte[])(refMessage[0]));
-				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -44,13 +45,13 @@ public class Proxy {
 	
 	boolean deliverMessageFromClient(Object[] refMessage) throws IOException, ClientConnectionException
 	{
-		MyLogger.log("in");
+//		MyLogger.log("in");
 		byte[] message = getConnectionToClient().readMessage();
-		MyLogger.log("from client : " + ClientMessageTable.getValue(message[0]) + ". size: " + message.length + ". message: " + MyLogger.byteArrayPrefix(message, 100));
+//		MyLogger.log("from client : " + ClientMessageTable.getValue(message[0]) + ". size: " + message.length + ". message: " + MyLogger.byteArrayPrefix(message, 100));
 //		System.out.println("from client : " + ClientMessageTable.getValue(message[0]) + ". size: " + message.length + ". message: " + MyLogger.byteArrayPrefix(message, 100));
 		boolean retVal = false;
 		if (message[0] == ClientMessageTable.getValue(ClientMessageTable.loadLevel) || message[0] == ClientMessageTable.getValue(ClientMessageTable.restartLevel)) {
-			MyLogger.log("Agent requests loading\restarting level. Ignoring.");
+			MyLogger.log("Agent requests " + ClientMessageTable.getValue(message[0]) + ". Ignoring.");
 			getConnectionToClient().write(new byte[] {1});
 			mMetaAgent.getWorkingAgent().loadLevel();
 		}
@@ -65,7 +66,7 @@ public class Proxy {
 			getConnectionToClient().write(screenshot);
 		}
 		else if (message[0] == ClientMessageTable.getValue(ClientMessageTable.getState)) {
-			getConnectionToClient().write(new byte[] {mMetaAgent.getWorkingAgent().getState()});	
+			getConnectionToClient().write(new byte[] {(byte)GameState.PLAYING.ordinal()});	
 		}
 		else {
 			mConnectionToServer.write(message);

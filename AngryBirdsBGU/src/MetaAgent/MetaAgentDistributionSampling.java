@@ -3,7 +3,7 @@ package MetaAgent;
 import java.io.File;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 10;
+	private final int mSamplesPerPair = 2;
 
 	public MetaAgentDistributionSampling(int pTimeConstraint) {
 		super(pTimeConstraint);

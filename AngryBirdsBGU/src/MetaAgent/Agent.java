@@ -47,10 +47,10 @@ public class Agent {
 		return retVal;
 	}
 	
-	protected byte getState() throws IOException {
-		byte state = (byte) mMetaAgent.mLastGameState.ordinal();
-		return state;
-	}
+//	protected byte getState() throws IOException {
+//		byte state = (byte) mMetaAgent.mLastGameState.ordinal();
+//		return state;
+//	}
 
 	public void loadLevel() {
 		// do nothing

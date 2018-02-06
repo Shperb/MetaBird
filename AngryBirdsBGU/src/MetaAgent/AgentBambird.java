@@ -11,18 +11,18 @@ public class AgentBambird extends Agent{
 		super(pExecutableFileName, pMetaAgent);
 	}
 
-	@Override
-	protected byte getState() throws IOException {
-		byte retVal;
-		if(mShouldReturnLoading) {
-			retVal = (byte) GameState.LOADING.ordinal();
-			mShouldReturnLoading = false;
-		}
-		else {
-			retVal = super.getState();
-		}
-		return retVal;		
-	}
+//	@Override
+//	protected byte getState() throws IOException {
+//		byte retVal;
+//		if(mShouldReturnLoading) {
+//			retVal = (byte) GameState.LOADING.ordinal();
+//			mShouldReturnLoading = false;
+//		}
+//		else {
+//			retVal = super.getState();
+//		}
+//		return retVal;		
+//	}
 	
 	@Override
 	public void loadLevel() {
