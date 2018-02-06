@@ -25,14 +25,18 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		}
 
 		mLevels.clear();
+		String retVal = "";
 		for (int i = 0; i < shortListOfFiles.length && mLevels.size() < 8; i++) {
 			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
 			if (isRequired(level)) {
 				mLevels.put(level, mLevels.size() + 1);
+				retVal += "," + level;
 			}
 		}
 		
-		return String.join(",", mLevels.keySet());
+		retVal = retVal.replaceFirst(",", "");
+		
+		return retVal;
 	}
 
 	@Override
