@@ -1,12 +1,13 @@
 package MetaAgent;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
 	private final int mSamplesPerPair = 2;
 
-	public MetaAgentDistributionSampling(int pTimeConstraint) {
-		super(pTimeConstraint);
+	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
+		super(pTimeConstraint, pAgents);
 	}
 
 	@Override
@@ -14,8 +15,33 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		return "Distribution Sampling";
 	}
 
+//	@Override
+//	protected String selectLevels() {
+//		File folder = new File(Constants.levelsDir);
+//		File[] listOfFiles = folder.listFiles();
+//		
+//		File[] shortListOfFiles = new File[20];
+//		for (int i=0; i<20; i++) {
+//			shortListOfFiles[i] = listOfFiles[i*20];
+//		}
+//
+//		mLevels.clear();
+//		String retVal = "";
+//		for (int i = 0; i < shortListOfFiles.length && mLevels.size() < 8; i++) {
+//			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
+//			if (isRequired(level)) {
+//				mLevels.put(level, mLevels.size() + 1);
+//				retVal += "," + level;
+//			}
+//		}
+//		
+//		retVal = retVal.replaceFirst(",", "");
+//		
+//		return retVal;
+//	}
+	
 	@Override
-	protected String selectLevels() {
+	protected ArrayList<String> getLevelsList() {
 		File folder = new File(Constants.levelsDir);
 		File[] listOfFiles = folder.listFiles();
 		
@@ -24,27 +50,19 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 			shortListOfFiles[i] = listOfFiles[i*20];
 		}
 
-		mLevels.clear();
-		String retVal = "";
-		for (int i = 0; i < shortListOfFiles.length && mLevels.size() < 8; i++) {
+		ArrayList<String> retVal = new ArrayList<>();
+		for (int i = 0; i < shortListOfFiles.length && retVal.size() < 8; i++) {
 			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
 			if (isRequired(level)) {
-				mLevels.put(level, mLevels.size() + 1);
-				retVal += "," + level;
+				retVal.add(level);
 			}
 		}
 		
-		retVal = retVal.replaceFirst(",", "");
-		
-		return retVal;
+		return retVal;		
 	}
 
 	@Override
-	protected String[] GetNewAgentAndLevel() throws Exception {
-		if (mLevels.isEmpty()) {
-			throw new Exception("done sampling");
-		}
-		
+	protected String[] GetNewAgentAndLevel()  {
 		final String[] retVal = {null,null};
 		mLevels.keySet().forEach(level->{
 			getAgentsNames().forEach(agent->{
@@ -55,14 +73,16 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 				}
 			});
 		});
-		if (retVal[0] == null) {
-			getGame().setEndTime();
-			selectLevels();
-			createNewGameEntry();
-			return GetNewAgentAndLevel();
+		return retVal;			
+	}
+	
+	@Override
+	protected boolean shouldStartNewGame() {
+		if (GetNewAgentAndLevel()[0] == null) {
+			return true;
 		}
 		else {
-			return retVal;			
+			return false;
 		}
 	}
 
@@ -91,5 +111,10 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 			});
 		});
 		return retVal[0];
+	}
+
+	@Override
+	protected boolean shouldExit() {
+		return getLevelsList().isEmpty();		
 	}
 }

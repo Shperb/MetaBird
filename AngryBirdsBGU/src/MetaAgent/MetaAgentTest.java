@@ -6,8 +6,8 @@ public class MetaAgentTest extends MetaAgent {
 
 
 
-	public MetaAgentTest(int pTimeConstraint) {
-		super(pTimeConstraint);
+	public MetaAgentTest(int pTimeConstraint, String[] pAgents) {
+		super(pTimeConstraint, pAgents);
 	}
 
 	@Override
@@ -22,5 +22,23 @@ public class MetaAgentTest extends MetaAgent {
 		ArrayList<String> agents = getAgentsNames();
 		String agent = agents.get((int) (Math.random() * agents.size()));
 		return new String[] {agent, level};
+	}
+
+	@Override
+	protected boolean shouldStartNewGame() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean shouldExit() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected ArrayList<String> getLevelsList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

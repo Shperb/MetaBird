@@ -8,7 +8,7 @@ public class Main {
 
 //			System.out.println(new SimpleDateFormat().format(new Date()));
 			
-			new MetaAgentDistributionSampling(600).start();
+			new MetaAgentDistributionSampling(600, new String[] {"planA", "naive", "AngryBER", "ihsev"}).start();
 			
 //			HashMap<Integer, Long> m1= new HashMap<>();
 //			m1.put(3, (long)4);

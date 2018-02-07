@@ -10,8 +10,8 @@ public class MetaAgentRoundRobin extends MetaAgent {
 
 	ArrayList<Agent> mAgentWhoTriedCurrentLevel = new ArrayList<>();
 
-	public MetaAgentRoundRobin(int pTimeConstraint) {
-		super(pTimeConstraint);
+	public MetaAgentRoundRobin(int pTimeConstraint, String[] pAgents) {
+		super(pTimeConstraint, pAgents);
 	}
 
 	@Override
@@ -43,5 +43,23 @@ public class MetaAgentRoundRobin extends MetaAgent {
 			}
 		}
 		return retVal;
+	}
+
+	@Override
+	protected boolean shouldStartNewGame() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean shouldExit() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected ArrayList<String> getLevelsList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

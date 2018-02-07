@@ -44,43 +44,62 @@ public abstract class MetaAgent {
 	abstract protected String getAlgorithmName();
 
 	abstract protected String[] GetNewAgentAndLevel() throws Exception;
+	
+	abstract protected boolean shouldStartNewGame();
+	
+	abstract protected boolean shouldExit();
+	
+	abstract protected ArrayList<String> getLevelsList();
 
-	public MetaAgent(int pTimeConstraint) {
+	public MetaAgent(int pTimeConstraint, String[] pAgents) {
 		Clock.setClock(new SystemClock());
 
-		mAgents.add(new Agent("planA", this));
-		mAgents.add(new Agent("naive", this));
-		mAgents.add(new Agent("AngryBER", this));
-		mAgents.add(new Agent("ihsev", this));
+		for (int i=0; i<pAgents.length; i++) {
+			mAgents.add(new Agent(pAgents[i], this));
+		}
 
 		mTimeConstraint = pTimeConstraint;
 	}
 
-	protected String selectLevels() {
-		File folder = new File(Constants.levelsDir);
-		File[] listOfFiles = folder.listFiles();
-
-		mLevels.clear();
-		while (mLevels.size() < 8) {
-			int rnd = (int) (Math.random() * listOfFiles.length);
-			String level = listOfFiles[rnd].toPath().getFileName().toString().replace(".json", "");
-			if (!mLevels.containsKey(level)) {
-				mLevels.put(level, mLevels.size() + 1);
-			}
+	private void selectLevels() throws Exception {
+		ArrayList<String> levelsList = getLevelsList();
+		if (levelsList.size() > 8) {
+			throw new Exception("Can't choose more than 8 levels");
 		}
-		return String.join(",", mLevels.keySet());
+		
+		String message = Constants.newGameMessage + String.join(",", levelsList);
+		
+		System.out.println(message);
+		MyLogger.log(message);
+		
+		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
+		byte[] configureResult = configure(Utils.intToByteArray(1000));
+		mProxy.setConfigureResult(configureResult);
+		getMyScore();// getMyScore waits for "start" button to be clicked on the server window
+		
+		mLevels.clear();
+		levelsList.forEach(l->{
+			mLevels.put(l, mLevels.size() + 1);
+		});
 	}
 
 	private void chooseAgentAndLevel() throws Exception {
-		String[] agentAndLevel = GetNewAgentAndLevel();
-		String agent = agentAndLevel[0];
-		String level = agentAndLevel[1];
+		if (shouldExit()) {
+			throw new Exception("Exiting");
+		}
+		if (getGame().getTimeElapsed() > getTimeConstraint() || shouldStartNewGame()) {
+			startNewGame();
+		} else {
+			String[] agentAndLevel = GetNewAgentAndLevel();
+			String agent = agentAndLevel[0];
+			String level = agentAndLevel[1];
 
-		mWorkingAgent = getAgent(agent);
-		loadLevel(level, agent);
+			mWorkingAgent = getAgent(agent);
+			loadLevel(level, agent);
 
-		MyLogger.log("selected agent " + agent + ", level " + level);
-		System.out.println("selected agent " + agent + ", level " + level);
+			MyLogger.log("selected agent " + agent + ", level " + level);
+			System.out.println("selected agent " + agent + ", level " + level);
+		}
 	}
 
 	private Agent getAgent(String pName) throws Exception {
@@ -112,11 +131,7 @@ public abstract class MetaAgent {
 	private void startNewGame() throws Exception {
 		MyLogger.log("starting new game");
 		// mLastGameState = GameState.MAIN_MENU;
-		String message = Constants.newGameMessage + selectLevels();
-		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
-		byte[] configureResult = configure(Utils.intToByteArray(1000));
-		mProxy.setConfigureResult(configureResult);
-		getMyScore();// getMyScore waits for "start" button to be clicked on the server window
+		selectLevels();
 		createNewGameEntry();
 		chooseAgentAndLevel();
 	}
@@ -201,11 +216,8 @@ public abstract class MetaAgent {
 					+ getTimeConstraint());
 			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
 					+ getTimeConstraint());
-			if (getGame().getTimeElapsed() > getTimeConstraint()) {
-				startNewGame();
-			} else {
-				chooseAgentAndLevel();
-			}
+
+			chooseAgentAndLevel();
 		}
 		// }
 		// mLastGameState = state;
@@ -414,10 +426,7 @@ public abstract class MetaAgent {
 		getLevel().state = LevelState.connection_error;
 		getLevel().setEndTime();
 		DBHandler.save(mData);
-		if (getGame().getTimeElapsed() > getTimeConstraint()) {
-			startNewGame();
-		} else {
-			chooseAgentAndLevel();
-		}
+
+		chooseAgentAndLevel();
 	}
 }

@@ -18,27 +18,27 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 	private final int mMaxHorizon = 180;
 	private String[] mChoice = null;
 
-	public MetaAgentDynamicProgramming(int pTimeConstraint) {
-		super(pTimeConstraint);
+	public MetaAgentDynamicProgramming(int pTimeConstraint, String[] pAgents) {
+		super(pTimeConstraint, pAgents);
 	}
 
-	@Override
-	protected String selectLevels() {
-		String levels = super.selectLevels();
-		mSamplingDistribution = true;
-		mGeneratePolicy = false;
-		mCache = new HashMap<>();
-		return levels;
-	}
-
-	@Override
-	protected String getAlgorithmName() {
-		if (mSamplingDistribution) {
-			return "Distribution Sampling";
-		} else {
-			return "dynamic programming horizon  " + mMaxHorizon;
-		}
-	}
+//	@Override
+//	protected String selectLevels() {
+//		String levels = super.selectLevels();
+//		mSamplingDistribution = true;
+//		mGeneratePolicy = false;
+//		mCache = new HashMap<>();
+//		return levels;
+//	}
+//
+//	@Override
+//	protected String getAlgorithmName() {
+//		if (mSamplingDistribution) {
+//			return "Distribution Sampling";
+//		} else {
+//			return "dynamic programming horizon  " + mMaxHorizon;
+//		}
+//	}
 
 	@Override
 	protected String[] GetNewAgentAndLevel() throws Exception {
@@ -220,5 +220,29 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 				}
 			});
 		});
+	}
+
+	@Override
+	protected String getAlgorithmName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected boolean shouldStartNewGame() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected boolean shouldExit() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected ArrayList<String> getLevelsList() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
