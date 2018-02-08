@@ -10,56 +10,57 @@ import MetaAgent.Distribution;
 
 public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 
-	public AlgorithmTesterDynamicProgramming(int pTimeConstraint) throws Exception {
-		super(pTimeConstraint);
-	}
-
-	protected HashMap<String, Integer> mLevels = new HashMap<>();
 	private HashMap<ChoiceEvaluation, Long> mCache = new HashMap<>();
 	private HashMap<String, HashMap<String, Distribution>> mScoresDistribution;
 	private HashMap<String, HashMap<String, Distribution>> mTimeDistribution;	
 
+	public AlgorithmTesterDynamicProgramming(int pTimeConstraint) throws Exception {
+		super(pTimeConstraint);
+		mScoresDistribution = getScoresDistribution();
+		mTimeDistribution = getTimeDistribution();
+	}
+
 	@Override
-	protected String[] getAgentAndLevel() throws ParseException {
-		System.out.println("generating policy");
+	protected String[] getAgentAndLevel(Game pGame) throws ParseException {
+//		System.out.println("mCache.size(): " + mCache.size());
 		String[] refChoice = new String[2];
-		HashMap<String, Long> scores = getLevelsScores();
-		mCache = new HashMap<>();
-		long timeLeft = getGame().getTimeLeft();
-		getValue(scores, timeLeft, refChoice, new Object[2], 0);
-		System.out.println("generating policy - done");
+		HashMap<String, Long> scores = getLevelsScores(pGame);
+		long timeLeft = pGame.getTimeLeft();
+		getValue(pGame, scores, timeLeft, refChoice, new Object[2], 0);
 		return refChoice;		
 	}
-
-	private Game getGame() {
-		return mGame;
+	
+	@Override
+	protected long test() throws ParseException {
+		mCache.clear();
+		return super.test();
 	}
 
-	private HashMap<String, Long> getLevelsScores() {
+	private HashMap<String, Long> getLevelsScores(Game pGame) {
 		HashMap<String, Long> retVal = new HashMap<>();
-		mLevels.keySet().forEach(level -> {
+		pGame.levelNames.forEach(level -> {
 			retVal.put(level, (long) 0);
 		});		
-		getGame().levels.forEach(level->{
+		pGame.levels.forEach(level->{
 			retVal.put(level.name, (long) level.score);			
 		});
 		return retVal;
 	};
 	
-	private long getValue(HashMap<String, Long> pScores, long pTimeLeft, String[] refChoice, Object[] refData, int depth) {
+	private long getValue(Game pGame, HashMap<String, Long> pScores, long pTimeLeft, String[] refChoice, Object[] refData, int depth) {
 		if (pTimeLeft <= 0) {
 			return sum(pScores);
 		} else {
 			long bestChoiceVal = 0;
-			refChoice[0] = getAgentsNames().iterator().next();
-			refChoice[1] = mLevels.keySet().iterator().next();			
-			Iterator<String> levelsIter = mLevels.keySet().iterator();
+			refChoice[0] = pGame.agents.iterator().next();
+			refChoice[1] = pGame.levelNames.iterator().next();			
+			Iterator<String> levelsIter = pGame.levelNames.iterator();
 			while (levelsIter.hasNext()) {
 				String level = levelsIter.next();
-				Iterator<String> agentsIter = getAgentsNames().iterator();
+				Iterator<String> agentsIter = pGame.agents.iterator();
 				while (agentsIter.hasNext()) {
 					String agent = agentsIter.next();
-					long choiceVal = evaluateChoice(level, agent, pScores, pTimeLeft, depth);
+					long choiceVal = evaluateChoice(pGame, level, agent, pScores, pTimeLeft, depth);
 					if (choiceVal > bestChoiceVal) {
 						bestChoiceVal = choiceVal;
 						refChoice[0] = agent;
@@ -81,7 +82,7 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 		return retVal;
 	}
 	
-	private long evaluateChoice(String level, String agent, HashMap<String, Long> pScores, long pTimeLeft, int depth) {
+	private long evaluateChoice(Game pGame, String level, String agent, HashMap<String, Long> pScores, long pTimeLeft, int depth) {
 		ChoiceEvaluation choiceEvaluation = new ChoiceEvaluation(level, agent, pScores, pTimeLeft);
 		if (mCache.containsKey(choiceEvaluation)) {
 			return mCache.get(choiceEvaluation);
@@ -97,7 +98,7 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 				Integer score = scoreDistributionIter.next();
 				HashMap<String, Long> newScores = getNewScores(pScores, level, score);
 				double likelihood = scoreDistribution.getLikelihood(score) * timeDistribution.getLikelihood(time);
-				retVal += likelihood * getValue(newScores, pTimeLeft - time, new String[2], new Object[2], depth + 1);
+				retVal += likelihood * getValue(pGame, newScores, pTimeLeft - time, new String[2], new Object[2], depth + 1);
 			}
 		}
 		mCache.put(choiceEvaluation, retVal);

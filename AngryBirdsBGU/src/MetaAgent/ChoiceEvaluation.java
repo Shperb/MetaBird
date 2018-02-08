@@ -66,7 +66,7 @@ public class ChoiceEvaluation {
 		 Iterator<String> iter = mScores.keySet().iterator();
 		 while (iter.hasNext()) {
 			 String key = iter.next();
-			 if (!mScores2.get(key).equals(mScores2.get(key))) {
+			 if (!mScores.get(key).equals(mScores2.get(key))) {
 				 return false;
 			 }
 		 }

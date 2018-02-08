@@ -1,12 +1,14 @@
 package DB;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import MetaAgent.MyLogger;
 
 public class Game extends Event{
-	public Collection<String> agents = new Collection<>();
+	public ArrayList<String> agents = new Collection<>();
+	public ArrayList<String> levelNames = new ArrayList<>();
 	public Collection<Level> levels = new Collection<>();
 	public String algorithm;
 	public int timeConstraint;

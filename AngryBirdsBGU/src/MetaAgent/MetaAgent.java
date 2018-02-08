@@ -2,13 +2,13 @@ package MetaAgent;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -141,6 +141,14 @@ public abstract class MetaAgent {
 		for (int i = 0; i < mAgents.size(); i++) {
 			getGame().agents.add(mAgents.get(i).getName());
 		}
+		ArrayList<String> levelNames = new ArrayList<>(mLevels.keySet());
+		levelNames.sort(new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return mLevels.get(o1).compareTo(mLevels.get(o2));
+			}
+		});
+		getGame().levelNames = levelNames;
 	}
 
 	protected Game getGame() {

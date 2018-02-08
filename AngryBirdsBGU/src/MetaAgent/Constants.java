@@ -1,12 +1,11 @@
 package MetaAgent;
 import java.util.HashSet;
 
-import Clock.Clock;
 import external.ClientMessageTable;
 
 public class Constants {
-	public final static String serverIp = "132.72.47.196";
-//	public final static String serverIp = "localhost";
+//	public final static String serverIp = "132.72.47.196";
+	public final static String serverIp = "localhost";
 	public final static int serverPort = 2005;
 	public final static int clientPort = 2004;
 	protected static long timeToTerminateAgentMilis = 3 * 60 * 1000;
