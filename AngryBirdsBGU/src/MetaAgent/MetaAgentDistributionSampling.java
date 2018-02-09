@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 5;
+	private final int mSamplesPerPair = 10;
 
 	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
 		super(pTimeConstraint, pAgents);

@@ -8,9 +8,11 @@ import java.util.HashSet;
 
 import com.google.gson.JsonSyntaxException;
 
+import DB.ValueExtractor.ValueExtractor;
+
 public class Queries {
 	
-	public void getLevelResults(Data pData) throws JsonSyntaxException, IOException {
+	public void getLevelsResults(Data pData) throws JsonSyntaxException, IOException {
 		HashMap<String, Integer> total = new HashMap<>();
 		HashMap<String, Integer> finished = new HashMap<>();
 		HashMap<String, Integer> won = new HashMap<>();
@@ -51,5 +53,42 @@ public class Queries {
 		Collections.sort(retVal);
 		
 		return retVal ;
+	}
+	
+	public ArrayList<String> getAllAgents(Data pData) {
+		HashSet<String> levels = new HashSet<>();
+		pData.games.forEach(game->{
+			game.levels.forEach(level->{
+				levels.add(level.agent);
+			});
+		});
+		
+		ArrayList<String> retVal = new ArrayList<>(levels);
+		Collections.sort(retVal);
+		
+		return retVal ;
+	}
+
+	public void getSupportSize(Data pData, ValueExtractor pValueExtractor) {
+		HashMap<String, HashMap<String, HashSet<Integer>>> results = new HashMap<>();
+		getAllAgents(pData).forEach(agent->{
+			results.put(agent, new HashMap<>());
+			HashMap<String, HashSet<Integer>> agentResults = results.get(agent);
+			getAllLevels(pData).forEach(level->{
+				agentResults.put(level, new HashSet<>());
+			});
+		});
+
+		pData.games.forEach(game->{
+			game.levels.forEach(level->{
+				results.get(level.agent).get(level.name).add(pValueExtractor.getValue(level));
+			});
+		});
+		
+		getAllAgents(pData).forEach(agent->{
+			getAllLevels(pData).forEach(level->{
+				System.out.println(agent + "\t" + level + "\t" + results.get(agent).get(level).size());
+			});
+		});
 	}
 }

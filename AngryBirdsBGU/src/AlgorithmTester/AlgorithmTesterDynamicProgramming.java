@@ -7,17 +7,23 @@ import java.util.Iterator;
 import DB.Game;
 import MetaAgent.ChoiceEvaluation;
 import MetaAgent.Distribution;
+import MetaAgent.Problem;
 
 public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 
 	private HashMap<ChoiceEvaluation, Long> mCache = new HashMap<>();
-	private HashMap<String, HashMap<String, Distribution>> mScoresDistribution;
-	private HashMap<String, HashMap<String, Distribution>> mTimeDistribution;	
+	protected HashMap<String, HashMap<String, Distribution>> mScoresDistribution;
+	protected HashMap<String, HashMap<String, Distribution>> mTimeDistribution;	
 
-	public AlgorithmTesterDynamicProgramming(int pTimeConstraint) throws Exception {
-		super(pTimeConstraint);
+	public AlgorithmTesterDynamicProgramming(Problem pProblem) throws Exception {
+		super(pProblem);
 		mScoresDistribution = getScoresDistribution();
 		mTimeDistribution = getTimeDistribution();
+	}
+
+	@Override
+	protected String getName() {
+		return "Dynamic programming (optimal)";
 	}
 
 	@Override
@@ -32,7 +38,6 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 	
 	@Override
 	protected long test() throws ParseException {
-		mCache.clear();
 		return super.test();
 	}
 

@@ -3,8 +3,6 @@ package AlgorithmTester;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 
 import Clock.Clock;
@@ -13,30 +11,35 @@ import DB.DBHandler;
 import DB.Data;
 import DB.Game;
 import DB.Level;
+import DB.ValueExtractor.ValueExtractor;
+import DB.ValueExtractor.ValueExtractorScore;
+import DB.ValueExtractor.ValueExtractorTimeTaken;
 import MetaAgent.Constants;
 import MetaAgent.Distribution;
+import MetaAgent.Problem;
 
 public abstract class AlgorithmTester {
 	private HashMap<String, HashMap<String, ArrayList<Integer>>> mScores;
 	private HashMap<String, HashMap<String, ArrayList<Integer>>> mRunTimes;
 	private ManualClock mClock;
-	private int mResultsPerPair = 2;
-	private int mTimeConstraint;
+	private int mResultsPerPair = 10;
+	private Problem mProblem;
 
 	protected abstract String[] getAgentAndLevel(Game pGame) throws ParseException;
+	protected abstract String getName();
 
-	public AlgorithmTester(int pTimeConstraint) throws Exception {
+	public AlgorithmTester(Problem pProblem) throws Exception {
 		mClock = new ManualClock();
 		Clock.setClock(mClock);
+		mProblem = pProblem;
 		init();
-		mTimeConstraint = pTimeConstraint;
 	}
 	
 	public int test(int pRepetitionsCount) throws ParseException {
 		long sum = 0;
 		for (int i=0; i<pRepetitionsCount; i++) {
 			long a = test();
-			System.out.println(a);
+			System.out.println(mProblem + "\t" + getName() + "\t" + a);
 			sum += a;
 		}
 		return (int) (sum / pRepetitionsCount);
@@ -51,10 +54,10 @@ public abstract class AlgorithmTester {
 	}
 
 	protected long test() throws ParseException {
-		Game game = new Game("", mTimeConstraint);
-		game.agents = getAgentsNames();
-		game.levelNames = selectLevels(getLevelsBank(), 4);
-		System.out.println("selected levels: " + String.join(",", game.levelNames));
+		Game game = new Game("", mProblem.timeConstraint);
+		game.agents = mProblem.agents;
+		game.levelNames = mProblem.levels;
+//		System.out.println("selected levels: " + String.join(",", game.levelNames));
 		while (game.getTimeElapsed() < game.timeConstraint) {
 			String[] agentAndLevel = getAgentAndLevel(game);
 			String agent = agentAndLevel[0];
@@ -70,10 +73,10 @@ public abstract class AlgorithmTester {
 	
 	private HashMap<String, HashMap<String, Distribution>> getDistribution(HashMap<String, HashMap<String, ArrayList<Integer>>> pValues) {
 		HashMap<String, HashMap<String, Distribution>> retVal = new HashMap<>();
-		getAgentsNames().forEach(agent->{
+		mProblem.agents.forEach(agent->{
 			retVal.put(agent, new HashMap<>());
 			HashMap<String, Distribution> agentDistribution = retVal.get(agent);
-			getLevelsBank().forEach(level->{
+			mProblem.levels.forEach(level->{
 				agentDistribution.put(level, new Distribution());
 				Distribution agent_level_ditribution = agentDistribution.get(level);
 				pValues.get(agent).get(level).forEach(v->{
@@ -84,14 +87,14 @@ public abstract class AlgorithmTester {
 		return retVal;
 	}
 	
-	private final ArrayList<String> getAgentsNames() {
-		ArrayList<String> retVal = new ArrayList<>();
-		retVal.add("planA");
-		retVal.add("naive");
-		retVal.add("ihsev");
-		retVal.add("AngryBER");
-		return retVal;
-	}
+//	private final ArrayList<String> getAgentsNames() {
+//		ArrayList<String> retVal = new ArrayList<>();
+//		retVal.add("planA");
+//		retVal.add("naive");
+//		retVal.add("ihsev");
+//		retVal.add("AngryBER");
+//		return retVal;
+//	}
 	
 	private int getScore(String pAgent, String pLevel) {
 		int retVal = get(mScores, pAgent, pLevel);
@@ -109,26 +112,26 @@ public abstract class AlgorithmTester {
 		return retVal;
 	}
 
-	private ArrayList<String> selectLevels(ArrayList<String> levelsBank, int pCnt) {
-//		Collections.shuffle(levelsBank);
-//		return new ArrayList<>(levelsBank.subList(0, pCnt));
-		return new ArrayList<>(Arrays.asList("Level8-1,Levelcherryblossom-4,Level159,Level5-2".split(",")));
-	}
+//	private ArrayList<String> selectLevels(ArrayList<String> levelsBank, int pCnt) {
+////		Collections.shuffle(levelsBank);
+////		return new ArrayList<>(levelsBank.subList(0, pCnt));
+//		return new ArrayList<>(Arrays.asList("Level8-1,Levelcherryblossom-4,Level159,Level5-2".split(",")));
+//	}
 
 	private void init() throws Exception {
 		Data data = DBHandler.loadData();
 		
-		mScores = getResults(data, new valueExtractorScore());
-		mRunTimes = getResults(data, new valueExtractorTimeTaken());
+		mScores = getResults(data, new ValueExtractorScore());
+		mRunTimes = getResults(data, new ValueExtractorTimeTaken());
 	}
 	
-	private HashMap<String, HashMap<String, ArrayList<Integer>>> getResults(Data pData, valueExtractor pValueExtractor) throws Exception{
+	private HashMap<String, HashMap<String, ArrayList<Integer>>> getResults(Data pData, ValueExtractor pValueExtractor) throws Exception{
 		HashMap<String, HashMap<String, ArrayList<Integer>>> results = new HashMap<>();
 		Exception e[] = {null};
-		getAgentsNames().forEach(agent->{
+		mProblem.agents.forEach(agent->{
 			results.put(agent, new HashMap<>());
 			HashMap<String, ArrayList<Integer>> resultsOfAgent = results.get(agent);
-			getLevelsBank().forEach(level->{
+			mProblem.levels.forEach(level->{
 				ArrayList<Integer> resultsOfPair = getResults(pData, agent, level, mResultsPerPair, pValueExtractor);
 				if (resultsOfPair.size() == mResultsPerPair) {
 					resultsOfAgent.put(level, resultsOfPair);
@@ -144,7 +147,7 @@ public abstract class AlgorithmTester {
 		return results;
 	}
 	
-	private ArrayList<Integer> getResults(Data data, String agent, String pLevel, int pResultsPerPair, valueExtractor pExtractor) {
+	private ArrayList<Integer> getResults(Data data, String agent, String pLevel, int pResultsPerPair, ValueExtractor pExtractor) {
 		ArrayList<Integer> retVal = new ArrayList<>();
 		data.games.forEach(game->{
 			game.levels.forEach(level->{
@@ -156,7 +159,7 @@ public abstract class AlgorithmTester {
 		return retVal;
 	}
 
-	private ArrayList<String> getLevelsBank() {
+	private ArrayList<String> _getLevelsBank() {
 		File folder = new File(Constants.levelsDir);
 		File[] listOfFiles = folder.listFiles();
 		
@@ -169,24 +172,10 @@ public abstract class AlgorithmTester {
 		return retVal;
 	}
 	
-	abstract class valueExtractor {
-		abstract int getValue(Level pLevel);		
-	}
 	
-	class valueExtractorScore extends valueExtractor{
-		@Override
-		int getValue(Level pLevel) {
-			return pLevel.score;
-		}
-	}
-	
-	class valueExtractorTimeTaken extends valueExtractor{
 
-		@Override
-		int getValue(Level pLevel) {
-			return pLevel.getTimeTaken(); 
-		}		
-	}
+	
+
 
 //	private HashMap<String, HashMap<String, ArrayList<Integer>>> getResultsFromDB(Data pData, valueExtractor pExtractor) throws JsonSyntaxException, IOException {
 //		HashMap<String, HashMap<String, ArrayList<Integer>>> data = new HashMap<>();
