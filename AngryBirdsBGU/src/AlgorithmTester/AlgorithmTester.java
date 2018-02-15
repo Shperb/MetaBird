@@ -1,6 +1,8 @@
 package AlgorithmTester;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import DB.ValueExtractor.ValueExtractorScore;
 import DB.ValueExtractor.ValueExtractorTimeTaken;
 import MetaAgent.Constants;
 import MetaAgent.Distribution;
+import MetaAgent.MyLogger;
 import MetaAgent.Problem;
 
 public abstract class AlgorithmTester {
@@ -25,7 +28,7 @@ public abstract class AlgorithmTester {
 	private int mResultsPerPair = 10;
 	private Problem mProblem;
 
-	protected abstract String[] getAgentAndLevel(Game pGame) throws ParseException;
+	protected abstract String[] getAgentAndLevel(Game pGame) throws Exception;
 	protected abstract String getName();
 
 	public AlgorithmTester(Problem pProblem) throws Exception {
@@ -35,15 +38,34 @@ public abstract class AlgorithmTester {
 		init();
 	}
 	
-	public int test(int pRepetitionsCount) throws ParseException {
+	public String test(int pRepetitionsCount, String[] refAdditionalData) throws Exception {
 		long sum = 0;
 		for (int i=0; i<pRepetitionsCount; i++) {
-			long a = test();
-			System.out.println(mProblem + "\t" + getName() + "\t" + a);
-			sum += a;
+			long gameScore = test();
+//			System.out.println(mProblem + "\t" + getName() + "\t" + gameScore + "\t" + getAdditionalData());
+			sum += gameScore;
 		}
-		return (int) (sum / pRepetitionsCount);
+		refAdditionalData[0] = getAdditionalData();
+		String toWrite = mProblem + "\t" + getName() + "\t" + sum / pRepetitionsCount + "\t" + getAdditionalData();
+		System.out.println(toWrite);
+		MyLogger.log(toWrite);
+		return toWrite;
 	}
+	
+	protected String getAdditionalData() {
+		return "";
+	}
+
+	protected HashMap<String, Long> getLevelsScores(Game pGame) {
+		HashMap<String, Long> retVal = new HashMap<>();
+		pGame.levelNames.forEach(level -> {
+			retVal.put(level, (long) 0);
+		});		
+		pGame.levels.forEach(level->{
+			retVal.put(level.name, Math.max(retVal.get(level.name), (long) level.score));			
+		});
+		return retVal;
+	};
 	
 	protected HashMap<String, HashMap<String, Distribution>> getScoresDistribution() {
 		return getDistribution(mScores);
@@ -53,7 +75,7 @@ public abstract class AlgorithmTester {
 		return getDistribution(mRunTimes);
 	}
 
-	protected long test() throws ParseException {
+	protected long test() throws Exception {
 		Game game = new Game("", mProblem.timeConstraint);
 		game.agents = mProblem.agents;
 		game.levelNames = mProblem.levels;

@@ -1,6 +1,5 @@
 package AlgorithmTester;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -11,6 +10,7 @@ import MetaAgent.Problem;
 
 public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 
+	private boolean mAllowCacheUpdate = true; 
 	private HashMap<ChoiceEvaluation, Long> mCache = new HashMap<>();
 	protected HashMap<String, HashMap<String, Distribution>> mScoresDistribution;
 	protected HashMap<String, HashMap<String, Distribution>> mTimeDistribution;	
@@ -25,46 +25,45 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 	protected String getName() {
 		return "Dynamic programming (optimal)";
 	}
+	
+	@Override
+	protected String getAdditionalData() {
+		return "cache size: " + mCache.size();
+	}
 
 	@Override
-	protected String[] getAgentAndLevel(Game pGame) throws ParseException {
+	protected String[] getAgentAndLevel(Game pGame) throws Exception {
 //		System.out.println("mCache.size(): " + mCache.size());
 		String[] refChoice = new String[2];
 		HashMap<String, Long> scores = getLevelsScores(pGame);
 		long timeLeft = pGame.getTimeLeft();
 		getValue(pGame, scores, timeLeft, refChoice, new Object[2], 0);
+		mAllowCacheUpdate = false;
 		return refChoice;		
 	}
 	
 	@Override
-	protected long test() throws ParseException {
+	protected long test() throws Exception {
 		return super.test();
 	}
 
-	private HashMap<String, Long> getLevelsScores(Game pGame) {
-		HashMap<String, Long> retVal = new HashMap<>();
-		pGame.levelNames.forEach(level -> {
-			retVal.put(level, (long) 0);
-		});		
-		pGame.levels.forEach(level->{
-			retVal.put(level.name, (long) level.score);			
-		});
-		return retVal;
-	};
-	
-	private long getValue(Game pGame, HashMap<String, Long> pScores, long pTimeLeft, String[] refChoice, Object[] refData, int depth) {
+	protected long getValue(Game pGame, HashMap<String, Long> pScores, long pTimeLeft, String[] refChoice, Object[] refData, int depth) throws Exception {
+		refChoice[0] = pGame.agents.iterator().next();
+		refChoice[1] = pGame.levelNames.iterator().next();			
 		if (pTimeLeft <= 0) {
 			return sum(pScores);
 		} else {
 			long bestChoiceVal = 0;
-			refChoice[0] = pGame.agents.iterator().next();
-			refChoice[1] = pGame.levelNames.iterator().next();			
 			Iterator<String> levelsIter = pGame.levelNames.iterator();
 			while (levelsIter.hasNext()) {
 				String level = levelsIter.next();
 				Iterator<String> agentsIter = pGame.agents.iterator();
 				while (agentsIter.hasNext()) {
 					String agent = agentsIter.next();
+					if (depth > 1000) {
+						int a=0;
+						a=a+5;
+					}
 					long choiceVal = evaluateChoice(pGame, level, agent, pScores, pTimeLeft, depth);
 					if (choiceVal > bestChoiceVal) {
 						bestChoiceVal = choiceVal;
@@ -87,10 +86,13 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 		return retVal;
 	}
 	
-	private long evaluateChoice(Game pGame, String level, String agent, HashMap<String, Long> pScores, long pTimeLeft, int depth) {
+	private long evaluateChoice(Game pGame, String level, String agent, HashMap<String, Long> pScores, long pTimeLeft, int depth) throws Exception {
 		ChoiceEvaluation choiceEvaluation = new ChoiceEvaluation(level, agent, pScores, pTimeLeft);
 		if (mCache.containsKey(choiceEvaluation)) {
 			return mCache.get(choiceEvaluation);
+		}
+		if (!mAllowCacheUpdate) {
+//			throw new Exception("mAllowCacheUpdate=" + mAllowCacheUpdate);
 		}
 		long retVal = 0;
 		Distribution timeDistribution = mTimeDistribution.get(agent).get(level);

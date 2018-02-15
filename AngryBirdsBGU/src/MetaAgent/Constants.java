@@ -22,6 +22,7 @@ public class Constants {
 	};
 	public static final int maxLevel = 21;
 	public static final String logFilePath =  "c:/temp/MetaAgent.log";
+//	public static final String logFilePath =  "c:/temp/AlgorithmsComparison.log";
 	public static final String levelsDir = "C:/temp/Ai-birds/Levels";
 	protected static String newGameMessage = "new game";
 }

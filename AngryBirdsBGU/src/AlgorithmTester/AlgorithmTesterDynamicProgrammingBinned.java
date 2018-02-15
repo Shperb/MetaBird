@@ -2,15 +2,19 @@ package AlgorithmTester;
 
 import java.util.HashMap;
 
+import DB.Game;
 import MetaAgent.Distribution;
 import MetaAgent.Problem;
 
 public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDynamicProgramming {
-	int mTimeRoundFactor;
-	int mScoreRoundFactor;
+	int mScoreRoundFactor = 1;
+	int mTimeRoundFactor = 1;
 
-	public AlgorithmTesterDynamicProgrammingBinned(Problem pProblem) throws Exception {
+	public AlgorithmTesterDynamicProgrammingBinned(Problem pProblem, int pScoreRoundFactor, int pTimeRoundFactor)
+			throws Exception {
 		super(pProblem);
+		mScoreRoundFactor = pScoreRoundFactor;
+		mTimeRoundFactor = pTimeRoundFactor;
 		round(mScoresDistribution, mScoreRoundFactor);
 		round(mTimeDistribution, mTimeRoundFactor);
 	}
@@ -18,6 +22,22 @@ public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDyna
 	@Override
 	protected String getName() {
 		return "Binned Dynamic programming. Time factor " + mTimeRoundFactor + ", Score factor " + mScoreRoundFactor;
+	}
+
+	// @Override
+	// protected HashMap<String, Long> getLevelsScores(Game pGame) {
+	// HashMap<String, Long> retVal = super.getLevelsScores(pGame);
+	// retVal.keySet().forEach(k->{
+	// retVal.
+	// });
+	// return retVal;
+	// }
+
+	@Override
+	protected long getValue(Game pGame, HashMap<String, Long> pScores, long pTimeLeft, String[] refChoice,
+			Object[] refData, int depth) throws Exception {
+		return super.getValue(pGame, round(pScores), (int) (pTimeLeft / mTimeRoundFactor) * mTimeRoundFactor, refChoice,
+				refData, depth);
 	}
 
 	private void round(HashMap<String, HashMap<String, Distribution>> pDistribution, int pFactor) {
@@ -32,9 +52,18 @@ public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDyna
 		Distribution retVal = new Distribution();
 		pDistribution.mTally.forEach((k, v) -> {
 			for (int i = 0; i < v; i++) {
-				retVal.addTally((int)(k /pFactor) * pFactor);
+				retVal.addTally((int) Math.ceil((double) k / pFactor) * pFactor);
 			}
 		});
 		return retVal;
 	}
+
+	private HashMap<String, Long> round(HashMap<String, Long> pScores) {
+		HashMap<String, Long> retVal = new HashMap<>();
+		pScores.forEach((k, v) -> {
+			retVal.put(k, (long) (v / mScoreRoundFactor) * mScoreRoundFactor);
+		});
+		return retVal;
+	}
+
 }
