@@ -15,16 +15,12 @@ import java.util.Iterator;
 
 import Clock.Clock;
 import Clock.SystemClock;
-import DB.DBHandler;
-import DB.Data;
-import DB.Game;
-import DB.Level;
-import DB.LevelState;
-import DB.Shot;
+import DB.*;
 import ab.vision.GameStateExtractor;
 import ab.vision.GameStateExtractor.GameState;
 import external.ClientMessageEncoder;
 import external.ClientMessageTable;
+import featureExtractor.demo.FeatureExctractor;
 
 public abstract class MetaAgent {
 
@@ -40,6 +36,7 @@ public abstract class MetaAgent {
 	private ArrayList<Agent> mAgents = new ArrayList<>();
 	private int mTimeConstraint;
 	ServerSocket mServerSocket;
+	private FeatureExctractor featureExtractor;
 
 	abstract protected String getAlgorithmName();
 
@@ -63,6 +60,9 @@ public abstract class MetaAgent {
 
 	private void selectLevels() throws Exception {
 		ArrayList<String> levelsList = getLevelsList();
+		while(levelsList.isEmpty()){
+			levelsList = getLevelsList();
+		}
 		if (levelsList.size() > 8) {
 			throw new Exception("Can't choose more than 8 levels");
 		}
@@ -123,6 +123,7 @@ public abstract class MetaAgent {
 		mProxy = new Proxy();
 		mData = DBHandler.loadData();
 		mProxy.setMetaAgent(this);
+		this.featureExtractor = new FeatureExctractor(this, this.mProxy);
 		runAgents();
 		startNewGame();
 		mProxy.start();
@@ -169,6 +170,10 @@ public abstract class MetaAgent {
 
 	private boolean isShotMessage(byte[] pMessage) {
 		return pMessage !=null && Constants.shotsMessages.contains(getMessageType(pMessage));
+	}
+
+	private boolean isLoadLevelMessage(byte[] pMessage) {
+		return pMessage !=null && getMessageType(pMessage) == ClientMessageTable.loadLevel;
 	}
 
 	public void actBeforeServerResponse(byte[] pMessage) throws IOException {
@@ -219,7 +224,7 @@ public abstract class MetaAgent {
 				getLevel().score = getScore(true);
 			}
 			getLevel().setEndTime();
-			DBHandler.save(mData);
+			DBHandler.saveData(mData);
 			System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
 					+ getTimeConstraint());
 			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
@@ -232,7 +237,7 @@ public abstract class MetaAgent {
 	}
 
 	private boolean notPlaying() throws ParseException {
-		int threshold = 20;
+		int threshold = 30;
 		long now = new Date().getTime();
 		if (getLevel().shots.isEmpty()) {
 			return getLevel().getTimeElapsed() > threshold;
@@ -274,6 +279,14 @@ public abstract class MetaAgent {
 				System.out.println(" Unexpected state: PLAYING");
 		}
 		return current_score;
+	}
+
+	private void extractFeatures(String pLevelName) throws Exception {
+		String message = "Extracting Features fot level " + pLevelName;
+		System.out.println(message);
+		MyLogger.log(message);
+		Features features = this.featureExtractor.growTreeAndReturnFeatures();
+		DBHandler.saveFeatures(pLevelName, features);
 	}
 
 	private int _getScore() throws Exception {
@@ -357,7 +370,7 @@ public abstract class MetaAgent {
 		byte[] message = { ClientMessageTable.getValue(ClientMessageTable.loadLevel), level };
 		mProxy.mConnectionToServer.write(message);
 		getGame().levels.add(new Level(pLevelName, pAgent));
-		DBHandler.save(mData);
+		DBHandler.saveData(mData);
 		int loaded = mProxy.mConnectionToServer.read();
 		GameState state = getGameState();
 		if (state == GameState.PLAYING) {
@@ -365,6 +378,12 @@ public abstract class MetaAgent {
 				mCurrentLevel = pLevelName;
 				MyLogger.log("loaded level " + level);
 				System.out.println("loaded level " + level);
+				try {
+					extractFeatures(pLevelName);
+				}
+				catch (Exception e){
+					MyLogger.log(e);
+				}
 			} else {
 				MyLogger.log("failed to load level " + level);
 				System.err.println("failed to load level " + level);
@@ -433,7 +452,7 @@ public abstract class MetaAgent {
 		mWorkingAgent.start(mServerSocket);
 		getLevel().state = LevelState.connection_error;
 		getLevel().setEndTime();
-		DBHandler.save(mData);
+		DBHandler.saveData(mData);
 
 		chooseAgentAndLevel();
 	}

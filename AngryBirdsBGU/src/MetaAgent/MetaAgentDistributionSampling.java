@@ -2,9 +2,11 @@ package MetaAgent;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 10;
+	private final int mSamplesPerPair = 2;
 
 	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
 		super(pTimeConstraint, pAgents);
@@ -44,10 +46,12 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 	protected ArrayList<String> getLevelsList() {
 		File folder = new File(Constants.levelsDir);
 		File[] listOfFiles = folder.listFiles();
-		
+		Arrays.sort(listOfFiles);
+
 		File[] shortListOfFiles = new File[20];
+
 		for (int i=0; i<20; i++) {
-			shortListOfFiles[i] = listOfFiles[i*20];
+			shortListOfFiles[i] = listOfFiles[i+50];
 		}
 
 		ArrayList<String> retVal = new ArrayList<>();
@@ -55,6 +59,9 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
 			if (isRequired(level)) {
 				retVal.add(level);
+			}
+			else{
+				shortListOfFiles[i].delete();
 			}
 		}
 		
