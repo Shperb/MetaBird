@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 2;
+	private final int mSamplesPerPair = 5;
 
 	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
 		super(pTimeConstraint, pAgents);
@@ -51,7 +51,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		File[] shortListOfFiles = new File[20];
 
 		for (int i=0; i<20; i++) {
-			shortListOfFiles[i] = listOfFiles[i+50];
+			shortListOfFiles[i] = listOfFiles[i*20];
 		}
 
 		ArrayList<String> retVal = new ArrayList<>();

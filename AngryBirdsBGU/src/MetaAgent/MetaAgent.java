@@ -237,7 +237,7 @@ public abstract class MetaAgent {
 	}
 
 	private boolean notPlaying() throws ParseException {
-		int threshold = 30;
+		int threshold = 60;
 		long now = new Date().getTime();
 		if (getLevel().shots.isEmpty()) {
 			return getLevel().getTimeElapsed() > threshold;

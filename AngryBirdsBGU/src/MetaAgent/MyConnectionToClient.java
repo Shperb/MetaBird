@@ -11,7 +11,7 @@ public class MyConnectionToClient extends MyConnection {
 
 	public MyConnectionToClient(String pExecutableFileName, ServerSocket pServerSocket) throws IOException {
 		String dir = "c:/temp/" + pExecutableFileName;
-		Runtime.getRuntime().exec(dir + "/" + pExecutableFileName + ".bat", null, new File(dir));
+		Runtime.getRuntime().exec("cmd /c start " + dir + "/" + pExecutableFileName + ".bat", null, new File(dir));
 		System.out.println("Waiting for a client " + pExecutableFileName + " ...");
 		Socket socket = pServerSocket.accept();
 		socket.setSoTimeout(20000);
