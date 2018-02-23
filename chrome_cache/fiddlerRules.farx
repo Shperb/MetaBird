@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AutoResponder LastSave="2018-02-16T12:56:04.1823758+02:00" FiddlerVersion="5.0.20173.50948">
+  <State Enabled="true" Fallthrough="true" UseLatency="false">
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-1.json" Action="C:\temp\Ai-birds\generatedResponse1.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-2.json" Action="C:\temp\Ai-birds\generatedResponse2.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-3.json" Action="C:\temp\Ai-birds\generatedResponse3.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-4.json" Action="C:\temp\Ai-birds\generatedResponse4.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-5.json" Action="C:\temp\Ai-birds\generatedResponse5.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-6.json" Action="C:\temp\Ai-birds\generatedResponse6.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-7.json" Action="C:\temp\Ai-birds\generatedResponse7.dat" Enabled="true" />
+    <ResponseRule Match="http://r221-dot-latest-dot-project-slingshot-hr.appspot.com/cors/fowl/json/Level1-8.json" Action="C:\temp\Ai-birds\generatedResponse8.dat" Enabled="true" />
+  </State>
+</AutoResponder>
