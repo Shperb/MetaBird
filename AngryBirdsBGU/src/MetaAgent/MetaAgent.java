@@ -172,10 +172,6 @@ public abstract class MetaAgent {
 		return pMessage !=null && Constants.shotsMessages.contains(getMessageType(pMessage));
 	}
 
-	private boolean isLoadLevelMessage(byte[] pMessage) {
-		return pMessage !=null && getMessageType(pMessage) == ClientMessageTable.loadLevel;
-	}
-
 	public void actBeforeServerResponse(byte[] pMessage) throws IOException {
 		if (isShotMessage(pMessage)) {
 			byte[] params = new byte[pMessage.length - 1];
@@ -282,7 +278,7 @@ public abstract class MetaAgent {
 	}
 
 	private void extractFeatures(String pLevelName) throws Exception {
-		String message = "Extracting Features fot level " + pLevelName;
+		String message = "Extracting Features for level " + pLevelName;
 		System.out.println(message);
 		MyLogger.log(message);
 		Features features = this.featureExtractor.growTreeAndReturnFeatures();
