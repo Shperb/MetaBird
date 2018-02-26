@@ -51,7 +51,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		File[] shortListOfFiles = new File[20];
 
 		for (int i=0; i<20; i++) {
-			shortListOfFiles[i] = listOfFiles[i*20];
+			shortListOfFiles[i] = listOfFiles[i];
 		}
 
 		ArrayList<String> retVal = new ArrayList<>();
