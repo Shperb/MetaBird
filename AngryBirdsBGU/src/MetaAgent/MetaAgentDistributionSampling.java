@@ -4,9 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 10;
+	private final int mSamplesPerPair = 12;
 
 	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
 		super(pTimeConstraint, pAgents);
@@ -46,7 +48,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 	protected ArrayList<String> getLevelsList() {
 		File folder = new File(Constants.levelsDir);
 		File[] listOfFiles = folder.listFiles();
-		Arrays.sort(listOfFiles);
+		shuffle(listOfFiles);
 
 		File[] shortListOfFiles = new File[20];
 
@@ -123,5 +125,17 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 	@Override
 	protected boolean shouldExit() {
 		return getLevelsList().isEmpty();		
+	}
+
+	private static <T> void shuffle(T[] ar){
+		Random rnd = ThreadLocalRandom.current();
+		for (int i = ar.length - 1; i > 0; i--)
+		{
+			int index = rnd.nextInt(i + 1);
+			// Simple swap
+			T a = ar[index];
+			ar[index] = ar[i];
+			ar[i] = a;
+		}
 	}
 }

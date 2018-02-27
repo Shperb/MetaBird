@@ -37,7 +37,7 @@ public class DBHandler {
 		}
 	}
 
-	private static String readFile(Path path, Charset encoding) throws IOException {
+	public static String readFile(Path path, Charset encoding) throws IOException {
 		byte[] encoded;
 		synchronized (lock) {
 			encoded = Files.readAllBytes((path));
@@ -71,7 +71,7 @@ public class DBHandler {
 		return getFile("data.json");
 	}
 
-	private static File getFile(String fileName) throws IOException {
+	public static File getFile(String fileName) throws IOException {
 		String dirName = "c:/MetaAgentDB/";
 		String FileName = dirName + fileName;
 		File dir = new File(dirName);
