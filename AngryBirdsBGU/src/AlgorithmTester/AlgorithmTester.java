@@ -28,7 +28,7 @@ public abstract class AlgorithmTester {
 	private int mResultsPerPair = 10;
 	private Problem mProblem;
 
-	protected abstract String[] getAgentAndLevel(Game pGame) throws Exception;
+	protected abstract String[] getAgentAndLevel(Game pGame,long[] additionalTime) throws Exception;
 	protected abstract String getName();
 
 	public AlgorithmTester(Problem pProblem) throws Exception {
@@ -40,13 +40,28 @@ public abstract class AlgorithmTester {
 	
 	public String test(int pRepetitionsCount, String[] refAdditionalData) throws Exception {
 		long sum = 0;
+		double totalTime = 0;
+		long[] additionalTime = new long[1];
+		double avarageScore = 0;
+		double variance = 0;
+		additionalTime[0] = 0;
 		for (int i=0; i<pRepetitionsCount; i++) {
-			long gameScore = test();
+			long tStart = System.currentTimeMillis();
+			long gameScore = test(additionalTime);
+			long tEnd = System.currentTimeMillis();
+			long tDelta = tEnd - tStart;
+			double oldAvarageScore = avarageScore;
+			avarageScore = (1.0/(i+1))*(gameScore + i * avarageScore );
+			if (i>0){
+				variance = (double)(i-1)/i * variance + (1.0/(i+1))*Math.pow(gameScore-oldAvarageScore,2);
+			}
+			totalTime+= tDelta / 1000.0;
 //			System.out.println(mProblem + "\t" + getName() + "\t" + gameScore + "\t" + getAdditionalData());
-			sum += gameScore;
+			sum += gameScore/pRepetitionsCount;
 		}
+		double additionalTimeInSeconds = additionalTime[0] / 1000.0;
 		refAdditionalData[0] = getAdditionalData();
-		String toWrite = mProblem + "\t" + getName() + "\t" + sum / pRepetitionsCount + "\t" + getAdditionalData();
+		String toWrite = "\t"+((double)(totalTime-additionalTimeInSeconds)/pRepetitionsCount +additionalTimeInSeconds) +"\t"+ "time" +"\t" + mProblem + "\t" + getName() + "\t" + avarageScore + "\t" + variance + "\t" + sum + "\t" + getAdditionalData();
 		System.out.println(toWrite);
 		MyLogger.log(toWrite);
 		return toWrite;
@@ -75,19 +90,26 @@ public abstract class AlgorithmTester {
 		return getDistribution(mRunTimes);
 	}
 
-	protected long test() throws Exception {
+	protected long changeTime(long time){
+		return time;
+	}
+	
+	protected long test(long[] additionalTime) throws Exception {
 		Game game = new Game("", mProblem.timeConstraint);
 		game.agents = mProblem.agents;
 		game.levelNames = mProblem.levels;
+		long timePassed = 0;
 //		System.out.println("selected levels: " + String.join(",", game.levelNames));
-		while (game.getTimeElapsed() < game.timeConstraint) {
-			String[] agentAndLevel = getAgentAndLevel(game);
+		while (timePassed < game.timeConstraint && game.getTimeElapsed() < game.timeConstraint) {
+			String[] agentAndLevel = getAgentAndLevel(game,additionalTime);
 			String agent = agentAndLevel[0];
 			String levelName = agentAndLevel[1];
 			game.levels.add(new Level(levelName, agent));
 			Level level = game.levels.get(game.levels.size() - 1);
-			mClock.proceed(getRunTime(agent, levelName) * 1000);
-			level.score = getScore(agent, levelName);
+			int retVal = get(mRunTimes, agent, levelName);
+			timePassed += retVal;
+			mClock.proceed(changeTime(retVal)*1000);
+			level.score = (retVal > game.timeConstraint - timePassed) ? 0 : getScore(agent, levelName);
 			level.setEndTime();
 		}
 		return game.getScore();

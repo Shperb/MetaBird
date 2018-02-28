@@ -32,12 +32,16 @@ public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDyna
 	// });
 	// return retVal;
 	// }
+	
+	protected long changeTime(long time){
+		return (long)(Math.ceil((double)time / mTimeRoundFactor)) * mTimeRoundFactor;
+	}
 
 	@Override
 	protected long getValue(Game pGame, HashMap<String, Long> pScores, long pTimeLeft, String[] refChoice,
-			Object[] refData, int depth) throws Exception {
-		return super.getValue(pGame, round(pScores), (int) (pTimeLeft / mTimeRoundFactor) * mTimeRoundFactor, refChoice,
-				refData, depth);
+			Object[] refData, int depth,long[] additionalTime,boolean first) throws Exception {
+		return super.getValue(pGame, round(pScores), (int) pTimeLeft, refChoice,
+				refData, depth,additionalTime,first);
 	}
 
 	private void round(HashMap<String, HashMap<String, Distribution>> pDistribution, int pFactor) {
@@ -61,7 +65,7 @@ public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDyna
 	private HashMap<String, Long> round(HashMap<String, Long> pScores) {
 		HashMap<String, Long> retVal = new HashMap<>();
 		pScores.forEach((k, v) -> {
-			retVal.put(k, (long) (v / mScoreRoundFactor) * mScoreRoundFactor);
+			retVal.put(k, (long) (Math.ceil((double)v / mScoreRoundFactor)* mScoreRoundFactor)) ;
 		});
 		return retVal;
 	}

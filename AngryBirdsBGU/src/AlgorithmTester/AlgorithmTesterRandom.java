@@ -10,7 +10,7 @@ public class AlgorithmTesterRandom extends AlgorithmTester {
 	}
 
 	@Override
-	protected String[] getAgentAndLevel(Game pGame) throws Exception {
+	protected String[] getAgentAndLevel(Game pGame,long[] additionalTime) throws Exception {
 		String[] retVal = new String[2];
 		retVal[0] = pGame.agents.get((int) (Math.random()*pGame.agents.size()));
 		retVal[1] = pGame.levelNames.get((int) (Math.random()*pGame.levelNames.size()));

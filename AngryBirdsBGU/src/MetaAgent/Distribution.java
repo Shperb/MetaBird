@@ -34,6 +34,21 @@ public class Distribution {
 		return sum[0] / getTotalTally();
 	}
 	
+	public double[] getExpectationBelowValue(long value) {
+		double[] ans = new double[2];
+		double[] sum = {0};
+		double[] totalBelow = {0};
+		mTally.forEach((k, v) -> {
+			if (k <= value){
+				sum[0] += k * v;
+				totalBelow[0] += v;
+			}
+		});
+		ans[0] = sum[0] / totalBelow[0];
+		ans[1] = totalBelow[0]/getTotalTally();
+		return ans;
+	}
+	
 	public double getExpectation(long pSubstract) {
 		double[] sum = { 0 };
 		mTally.forEach((k, v) -> {

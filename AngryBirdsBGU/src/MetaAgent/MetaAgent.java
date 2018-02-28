@@ -219,7 +219,7 @@ public abstract class MetaAgent {
 				getLevel().score = getScore(true);
 			}
 			getLevel().setEndTime();
-			DBHandler.save(mData);
+			DBHandler.saveData(mData);
 			System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
 					+ getTimeConstraint());
 			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
@@ -357,7 +357,7 @@ public abstract class MetaAgent {
 		byte[] message = { ClientMessageTable.getValue(ClientMessageTable.loadLevel), level };
 		mProxy.mConnectionToServer.write(message);
 		getGame().levels.add(new Level(pLevelName, pAgent));
-		DBHandler.save(mData);
+		DBHandler.saveData(mData);
 		int loaded = mProxy.mConnectionToServer.read();
 		GameState state = getGameState();
 		if (state == GameState.PLAYING) {
@@ -433,7 +433,7 @@ public abstract class MetaAgent {
 		mWorkingAgent.start(mServerSocket);
 		getLevel().state = LevelState.connection_error;
 		getLevel().setEndTime();
-		DBHandler.save(mData);
+		DBHandler.saveData(mData);
 
 		chooseAgentAndLevel();
 	}
