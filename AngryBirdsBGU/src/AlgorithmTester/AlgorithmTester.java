@@ -113,7 +113,7 @@ public abstract class AlgorithmTester {
 			int retVal = getRunTime (agent, levelName);
 			timePassed += retVal;
 			mClock.proceed(changeTime(retVal)*1000);
-			level.score = (retVal > game.timeConstraint - timePassed) ? 0 : getScore(agent, levelName);
+			level.score = /*(retVal > game.timeConstraint - timePassed) ? 0 : */getScore(agent, levelName);
 			level.setEndTime();
 		}
 		return game.getScore();

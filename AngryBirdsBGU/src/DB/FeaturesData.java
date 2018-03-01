@@ -30,6 +30,18 @@ public class FeaturesData {
 		return results;
     }
     
+	public double computeMaxScoreBasedOnFeatures(String level){
+		double max = 0;
+		List<Features> levelFeatures = features.get(level);
+		for (Features feature : levelFeatures){
+			double currentValue = feature.computeMaxScoreBasedOnFeatures();
+			if (currentValue > max){
+				max = currentValue;
+			}
+		}
+		return max;
+	}
+    
 	public static <T> T majority (List<T> lst) {
 	    Map<T, Integer> map = new HashMap<T, Integer>();
 	    for (T obj : lst) {
@@ -46,4 +58,5 @@ public class FeaturesData {
 	    
 	    return popular;
 	}
+	
 }

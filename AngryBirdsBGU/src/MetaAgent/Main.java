@@ -69,7 +69,7 @@ public class Main {
 					int numberOfRepetition = 10000;
 					
 					//original
-					
+					/*
 					if (levelNumber <4 || timeConstraint < 600){
 						new AlgorithmTesterDynamicProgramming(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution()).test(numberOfRepetition, additionalData);
 						new AlgorithmTesterDynamicProgrammingBinned(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution(), 1000, 1).test(numberOfRepetition, additionalData);
@@ -79,7 +79,7 @@ public class Main {
 						new AlgorithmTesterDynamicProgrammingBinned(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution(), 1000, 10).test(numberOfRepetition, additionalData);
 					}
 					new AlgorithmTesterDynamicProgrammingBinned(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution(), 10000, 10).test(numberOfRepetition, additionalData);
-					
+					*/
 					new AlgorithmTesterScoreGreedy(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution(),true).test(numberOfRepetition, additionalData);
 					new AlgorithmTesterScoreGreedy(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution(),false).test(numberOfRepetition, additionalData);
 					new AlgorithmTesterRateGreedy(problem,de.getRealScoreDistribution(),de.getRealTimeDistribution(),de.getRealScoreDistribution(),de.getRealTimeDistribution(),true).test(numberOfRepetition, additionalData);

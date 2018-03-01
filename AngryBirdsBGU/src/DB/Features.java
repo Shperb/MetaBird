@@ -54,6 +54,10 @@ public class Features {
 	public static int amountOfFeatuers() {
 		return 19;
 	}
+	
+	public double computeMaxScoreBasedOnFeatures(){
+		return (numBirds-1)*10000+ numPigs*5200+(stoneObjects+woodObjects+iceObjects)*1250;
+	}
 
 
 }

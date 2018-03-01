@@ -3,22 +3,22 @@ package Distribution;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 public class DistributionOfDistribution extends Distribution{
-	HashMap<Distribution, Double> mDistributionsProbabilities;
+	private HashMap<Distribution, Double> mDistributionsProbabilities;
+	private double mMaxScore;
 	
-	public DistributionOfDistribution(HashMap<Distribution, Double> distributionsProbabilities){
+	public DistributionOfDistribution(HashMap<Distribution, Double> distributionsProbabilities,double maxScore){
 		mDistributionsProbabilities = distributionsProbabilities;
+		mMaxScore = maxScore;
 	}
-
 	@Override
 	public double getLikelihood(Integer pVal) {
 		double[] retVal = {0};
 		for (Entry<Distribution, Double> entry: mDistributionsProbabilities.entrySet()){
-			retVal[0] += entry.getKey().getLikelihood(pVal) * entry.getValue();
+			retVal[0] += entry.getKey().getLikelihood((int)(entry.getKey().getMaxScore()* pVal/getMaxScore())) * entry.getValue();
 		}
 		return retVal[0];
 	}
@@ -27,8 +27,8 @@ public class DistributionOfDistribution extends Distribution{
 	public double[] getExpectationBelowValue(long value) {
 		double[] retVal = {0,0};
 		mDistributionsProbabilities.forEach((dist, prob)->{
-			retVal[0] += dist.getExpectationBelowValue(value)[0] * prob;
-			retVal[1] += dist.getExpectationBelowValue(value)[1] * prob;
+			retVal[0] += dist.getExpectationBelowValue((int)(value/getMaxScore() * dist.getMaxScore()))[0] * prob;
+			retVal[1] += dist.getExpectationBelowValue((int)(value/getMaxScore() * dist.getMaxScore()))[1] * prob;
 		});
 		return retVal;
 	}
@@ -37,7 +37,7 @@ public class DistributionOfDistribution extends Distribution{
 	public double getExpectation(long pSubstract) {
 		double[] retVal = {0};
 		for (Entry<Distribution, Double> entry: mDistributionsProbabilities.entrySet()){
-			retVal[0] += entry.getKey().getExpectation(pSubstract) * entry.getValue();
+			retVal[0] += entry.getKey().getExpectation(pSubstract)/entry.getKey().getMaxScore() * getMaxScore() * entry.getValue();
 		}
 		return retVal[0];
 	}
@@ -51,7 +51,7 @@ public class DistributionOfDistribution extends Distribution{
 			Entry<Distribution, Double> entry = iter.next();
 			sum+= entry.getValue();
 			if (sum >= random){
-				return entry.getKey().drawValue();
+				return (int)(entry.getKey().drawValue()/entry.getKey().getMaxScore() * getMaxScore());
 			}
 		}
 		throw new Exception("Ilegal distribution draw");
@@ -61,7 +61,10 @@ public class DistributionOfDistribution extends Distribution{
 	public Set<Integer> getSupport() {
 		Set<Integer> result = new HashSet<Integer>();
 		for (Distribution dis: mDistributionsProbabilities.keySet()){
-			result.addAll(dis.getSupport());
+			Set<Integer> supp = dis.getSupport();
+			for (Integer value : supp){
+				result.add((int) (value / dis.getMaxScore() * getMaxScore()));
+			}
 		}
 		return result;
 	}
@@ -76,6 +79,11 @@ public class DistributionOfDistribution extends Distribution{
 	@Override
 	public String distributionType() {
 		return "learned distributions";
+	}
+
+	@Override
+	public double getMaxScore() {
+		return mMaxScore;
 	}
 
 }

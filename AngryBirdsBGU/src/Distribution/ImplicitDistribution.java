@@ -8,6 +8,16 @@ import java.util.Set;
 
 public class ImplicitDistribution extends Distribution{
 	public HashMap<Integer, Integer> mTally = new HashMap<>();
+	private double mMaxScore;
+	
+	private ImplicitDistribution(){
+		
+	}
+	
+	public ImplicitDistribution(double maxScore){
+		mMaxScore = maxScore;
+	}
+	
 	private int mTotalTally = 0;
 
 	public void addTally(Integer pVal) {
@@ -89,5 +99,10 @@ public class ImplicitDistribution extends Distribution{
 	@Override
 	public String distributionType() {
 		return "true distributions";
+	}
+
+	@Override
+	public double getMaxScore() {
+		return mMaxScore;
 	}
 }

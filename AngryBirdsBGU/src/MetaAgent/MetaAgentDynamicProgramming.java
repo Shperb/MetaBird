@@ -204,8 +204,8 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 			mScoresDistribution.put(agent, new HashMap<>());
 			mTimeDistribution.put(agent, new HashMap<>());
 			mLevels.keySet().forEach(level -> {
-				mScoresDistribution.get(agent).put(level, new ImplicitDistribution());
-				mTimeDistribution.get(agent).put(level, new ImplicitDistribution());
+				//mScoresDistribution.get(agent).put(level, new ImplicitDistribution());
+				//mTimeDistribution.get(agent).put(level, new ImplicitDistribution());
 			});
 		});
 

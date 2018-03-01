@@ -20,15 +20,17 @@ import Distribution.DistributionOfDistribution;
 import Distribution.ImplicitDistribution;
 
 public class DistributionExtraction {
-	private double epsilon = 0.0001;
-	private HashMap<String,List<Double>> mLevelFeatures;
-	private HashMap<String, HashMap<String, ArrayList<Integer>>> mScores;
-	private HashMap<String, HashMap<String, ArrayList<Integer>>> mRunTimes;
-	private List<String> mAgents;
-	private List<String> mLevels;
+	protected double epsilon = 0.0001;
+	protected HashMap<String,List<Double>> mLevelFeatures;
+	protected HashMap<String, HashMap<String, ArrayList<Integer>>> mScores;
+	protected HashMap<String, HashMap<String, ArrayList<Integer>>> mRunTimes;
+	protected FeaturesData mfeaturesData;
+	protected List<String> mAgents;
+	protected List<String> mLevels;
 	
 	public DistributionExtraction(List<String> agents) throws JsonSyntaxException, IOException {
 		FeaturesData featuresData = DBHandler.loadFeatures();
+		mfeaturesData = featuresData;
 		mLevelFeatures = featuresData.getFeaturesAsList();
 		mAgents = agents;
 		Data data = DBHandler.loadData();
@@ -40,6 +42,8 @@ public class DistributionExtraction {
 		mLevels = new ArrayList<String>();
 		mLevels.addAll(mLevelFeatures.keySet());
 	}
+	
+
 		
 	public HashMap<String, HashMap<String, Distribution>> getRealScoreDistribution(){
 		return getDistribution(mScores);
@@ -155,7 +159,7 @@ public class DistributionExtraction {
 
 	}
 	
-	private HashMap<String,Double> computeDistanceFromEachLevel(String level){
+	public HashMap<String,Double> computeDistanceFromEachLevel(String level){
 		List<Double> features = mLevelFeatures.get(level);
 		HashMap<String,List<Double>> LevelFeatures = new HashMap<String,List<Double>>(mLevelFeatures);
 		LevelFeatures.remove(level);
@@ -170,7 +174,7 @@ public class DistributionExtraction {
 	        return Math.sqrt(Sum);
 	}
 	
-	private HashMap<String, HashMap<String, Distribution>> getPolicyDistribution(
+	protected HashMap<String, HashMap<String, Distribution>> getPolicyDistribution(
 			HashMap<String, HashMap<String, Distribution>> distributions) {
 		HashMap<String, HashMap<String, Distribution>> results = new HashMap<String, HashMap<String,Distribution>>();
 		for (String agent : mAgents){
@@ -183,7 +187,7 @@ public class DistributionExtraction {
 					
 					distributionOfDistributions.put(agentDistribution.get(lvl), distance.get(lvl));
 				}
-				agentNewDistributions.put(level, new DistributionOfDistribution(distributionOfDistributions));
+				agentNewDistributions.put(level, new DistributionOfDistribution(distributionOfDistributions,mfeaturesData.computeMaxScoreBasedOnFeatures(level)));
 			}
 			results.put(agent, agentNewDistributions);
 		}
@@ -197,7 +201,7 @@ public class DistributionExtraction {
 			retVal.put(agent, agentMap);
 			HashMap<String, Distribution> agentDistribution = retVal.get(agent);
 			pValues.get(agent).keySet().forEach(level->{
-				ImplicitDistribution dist = new ImplicitDistribution();
+				ImplicitDistribution dist = new ImplicitDistribution(mfeaturesData.computeMaxScoreBasedOnFeatures(level));
 				agentDistribution.put(level, dist);
 				pValues.get(agent).get(level).forEach(v->{
 					dist.addTally(v);

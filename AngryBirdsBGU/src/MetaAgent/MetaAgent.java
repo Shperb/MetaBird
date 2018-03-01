@@ -249,13 +249,13 @@ public abstract class MetaAgent {
 
 	private boolean scoreNotChanging() {
 		int shotsCnt = 3;
-		ImplicitDistribution distribution = new ImplicitDistribution();
+		//ImplicitDistribution distribution = new ImplicitDistribution();
 		boolean[] retVal = { false };
 		getLevel().shots.forEach(shot -> {
-			distribution.addTally(shot.score);
-			if (distribution.getLikelihood(shot.score) * distribution.getTotalTally() + 0.5 >= shotsCnt) {
-				retVal[0] = true;
-			}
+			//distribution.addTally(shot.score);
+			//if (distribution.getLikelihood(shot.score) * distribution.getTotalTally() + 0.5 >= shotsCnt) {
+			//	retVal[0] = true;
+			//}
 		});
 		return retVal[0];
 	}

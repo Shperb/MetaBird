@@ -11,6 +11,7 @@ public abstract class Distribution {
 	public abstract Set<Integer> getSupport();
 	public abstract void round(int pFactor);
 	public abstract String distributionType();
+	public abstract double getMaxScore();
 	
 	public double getExpectation() {
 		return getExpectation(0);
