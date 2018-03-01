@@ -3,7 +3,7 @@ package AlgorithmTester;
 import java.util.HashMap;
 
 import DB.Game;
-import MetaAgent.Distribution;
+import Distribution.Distribution;
 import MetaAgent.Problem;
 
 public class AlgorithmTesterRoundRobinSingleAgent extends AlgorithmTester {
@@ -12,8 +12,13 @@ public class AlgorithmTesterRoundRobinSingleAgent extends AlgorithmTester {
 	protected String _agent;
 	protected int _position;
 
-	public AlgorithmTesterRoundRobinSingleAgent(Problem pProblem,String agent) throws Exception {
-		super(pProblem);
+	public AlgorithmTesterRoundRobinSingleAgent(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution,
+			String agent) throws Exception {
+		super(pProblem,realScoreDistribution,realTimeDistribution,policyScoreDistribution,policyTimeDistribution);
 		mScoresDistribution = getScoresDistribution();
 		_agent = agent;
 		_position = 0;
@@ -31,7 +36,7 @@ public class AlgorithmTesterRoundRobinSingleAgent extends AlgorithmTester {
 
 	@Override
 	protected String getName() {
-		return "Single Agent - " + _agent;
+		return "Single Agent - " + _agent + getNameExtension();
 	}
 
 }

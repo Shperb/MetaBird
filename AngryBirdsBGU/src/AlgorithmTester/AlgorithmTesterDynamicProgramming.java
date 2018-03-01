@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import DB.Game;
+import Distribution.Distribution;
 import MetaAgent.ChoiceEvaluation;
-import MetaAgent.Distribution;
 import MetaAgent.Problem;
 
 public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
@@ -15,15 +15,19 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 	protected HashMap<String, HashMap<String, Distribution>> mScoresDistribution;
 	protected HashMap<String, HashMap<String, Distribution>> mTimeDistribution;	
 
-	public AlgorithmTesterDynamicProgramming(Problem pProblem) throws Exception {
-		super(pProblem);
+	public AlgorithmTesterDynamicProgramming(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution) throws Exception {
+		super(pProblem,realScoreDistribution,realTimeDistribution,policyScoreDistribution,policyTimeDistribution);
 		mScoresDistribution = getScoresDistribution();
 		mTimeDistribution = getTimeDistribution();
 	}
 
 	@Override
 	protected String getName() {
-		return "Dynamic programming (optimal)";
+		return "Dynamic programming (optimal)" + getNameExtension();
 	}
 	
 	@Override
@@ -83,20 +87,24 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 			return mCache.get(choiceEvaluation);
 		}
 		if (!mAllowCacheUpdate) {
+			compare(mScoresDistribution, mRealScoreDistribution);
+			compare(mTimeDistribution, mRealRunTimeDistribution);
+			compare(mRealScoreDistribution, mScoresDistribution);
+			compare(mRealRunTimeDistribution, mTimeDistribution);
 			throw new Exception("mAllowCacheUpdate=" + mAllowCacheUpdate);
 		}
 		long tStart = System.currentTimeMillis();
 		long retVal = 0;
 		Distribution timeDistribution = mTimeDistribution.get(agent).get(level);
 		Distribution scoreDistribution = mScoresDistribution.get(agent).get(level);
-		Iterator<Integer> timeDistributionIter = timeDistribution.mTally.keySet().iterator();
+		Iterator<Integer> timeDistributionIter = timeDistribution.getSupport().iterator();
 		while (timeDistributionIter.hasNext()) {
 			Integer time = timeDistributionIter.next();
 			if (time > pTimeLeft){
 				retVal += sum(pScores) * timeDistribution.getLikelihood(time);
 			}
 			else{
-				Iterator<Integer> scoreDistributionIter = scoreDistribution.mTally.keySet().iterator();
+				Iterator<Integer> scoreDistributionIter = scoreDistribution.getSupport().iterator();
 				while (scoreDistributionIter.hasNext()) {
 					Integer score = scoreDistributionIter.next();
 					HashMap<String, Long> newScores = getNewScores(pScores, level, score);
@@ -110,6 +118,20 @@ public  class AlgorithmTesterDynamicProgramming extends AlgorithmTester{
 			additionalTime[0] += System.currentTimeMillis() - tStart;
 		}
 		return retVal;
+	}
+
+	private void compare(
+			HashMap<String, HashMap<String, Distribution>> pMap1,
+			HashMap<String, HashMap<String, Distribution>> pMap2) {
+		for (String agent : pMap1.keySet()){
+			for (String level : pMap1.get(agent).keySet()){
+				double exp1 = pMap1.get(agent).get(level).getExpectation();
+				double exp2 = pMap2.get(agent).get(level).getExpectation();
+				if (exp1 != exp2){
+					System.out.println("compare failed");
+				}
+			}
+		}
 	}
 
 	private HashMap<String, Long> getNewScores(HashMap<String, Long> pScores, String level, long pValue) {

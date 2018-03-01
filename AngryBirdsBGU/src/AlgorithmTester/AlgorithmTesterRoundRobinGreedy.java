@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import DB.Game;
-import MetaAgent.Distribution;
+import Distribution.Distribution;
 import MetaAgent.Problem;
 
 public class AlgorithmTesterRoundRobinGreedy extends AlgorithmTester {
@@ -15,8 +15,12 @@ public class AlgorithmTesterRoundRobinGreedy extends AlgorithmTester {
 	protected int _position;
 
 
-	public AlgorithmTesterRoundRobinGreedy(Problem pProblem) throws Exception {
-		super(pProblem);
+	public AlgorithmTesterRoundRobinGreedy(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution) throws Exception {
+		super(pProblem,realScoreDistribution,realTimeDistribution,policyScoreDistribution,policyTimeDistribution);
 		mScoresDistribution = getScoresDistribution();
 		selectedPairs = new HashMap<String, List<String>>();
 		_position = 0;
@@ -31,7 +35,7 @@ public class AlgorithmTesterRoundRobinGreedy extends AlgorithmTester {
 
 	@Override
 	protected String getName() {
-		return "RoundRobinGreedy";
+		return "RoundRobinGreedy" + getNameExtension();
 	}
 
 	private int getHighestAdditionalUtility(Game pGame, String[] refChoice) {
@@ -42,14 +46,15 @@ public class AlgorithmTesterRoundRobinGreedy extends AlgorithmTester {
 		}
 		refChoice[1] = levelToPlay;
 		_position = (_position+1) % pGame.levelNames.size();
-		mScoresDistribution.forEach((agent, v) -> {
-			Distribution dis = v.get(levelToPlay);
+		for (String agent : pGame.agents){
+			HashMap<String, Distribution> agentDistribution = mScoresDistribution.get(agent);
+			Distribution dis = agentDistribution.get(levelToPlay);
 			double exp = dis.getExpectation();
 			if (exp > retVal[0] && !(selectedPairs.get(levelToPlay).contains(agent))) {
 				retVal[0] = exp;
 				refChoice[0] = agent;	
 			}
-		});
+		}
 		selectedPairs.get(levelToPlay).add(refChoice[0]);
 		if (selectedPairs.get(levelToPlay).size() == pGame.agents.size()){
 			selectedPairs.put(levelToPlay,new ArrayList<String>());

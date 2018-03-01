@@ -21,6 +21,8 @@ import DB.Game;
 import DB.Level;
 import DB.LevelState;
 import DB.Shot;
+import Distribution.Distribution;
+import Distribution.ImplicitDistribution;
 import ab.vision.GameStateExtractor;
 import ab.vision.GameStateExtractor.GameState;
 import external.ClientMessageEncoder;
@@ -247,7 +249,7 @@ public abstract class MetaAgent {
 
 	private boolean scoreNotChanging() {
 		int shotsCnt = 3;
-		Distribution distribution = new Distribution();
+		ImplicitDistribution distribution = new ImplicitDistribution();
 		boolean[] retVal = { false };
 		getLevel().shots.forEach(shot -> {
 			distribution.addTally(shot.score);

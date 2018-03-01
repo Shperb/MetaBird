@@ -3,16 +3,20 @@ package AlgorithmTester;
 import java.util.HashMap;
 
 import DB.Game;
-import MetaAgent.Distribution;
+import Distribution.Distribution;
 import MetaAgent.Problem;
 
 public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDynamicProgramming {
 	int mScoreRoundFactor = 1;
 	int mTimeRoundFactor = 1;
 
-	public AlgorithmTesterDynamicProgrammingBinned(Problem pProblem, int pScoreRoundFactor, int pTimeRoundFactor)
-			throws Exception {
-		super(pProblem);
+	public AlgorithmTesterDynamicProgrammingBinned(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution,
+			int pScoreRoundFactor, int pTimeRoundFactor) throws Exception {
+		super(pProblem,realScoreDistribution,realTimeDistribution,policyScoreDistribution,policyTimeDistribution);
 		mScoreRoundFactor = pScoreRoundFactor;
 		mTimeRoundFactor = pTimeRoundFactor;
 		round(mScoresDistribution, mScoreRoundFactor);
@@ -21,7 +25,7 @@ public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDyna
 
 	@Override
 	protected String getName() {
-		return "Binned Dynamic programming. Time factor " + mTimeRoundFactor + ", Score factor " + mScoreRoundFactor;
+		return "Binned Dynamic programming. Time factor " + mTimeRoundFactor + ", Score factor " + mScoreRoundFactor  + getNameExtension();
 	}
 
 	// @Override
@@ -46,22 +50,13 @@ public class AlgorithmTesterDynamicProgrammingBinned extends AlgorithmTesterDyna
 
 	private void round(HashMap<String, HashMap<String, Distribution>> pDistribution, int pFactor) {
 		pDistribution.values().forEach(v -> {
-			v.keySet().forEach(k -> {
-				v.put(k, round(v.get(k), pFactor));
+			v.values().forEach(vl -> {
+				vl.round(pFactor);
 			});
 		});
 	}
 
-	private Distribution round(Distribution pDistribution, int pFactor) {
-		Distribution retVal = new Distribution();
-		pDistribution.mTally.forEach((k, v) -> {
-			for (int i = 0; i < v; i++) {
-				retVal.addTally((int) Math.ceil((double) k / pFactor) * pFactor);
-			}
-		});
-		return retVal;
-	}
-
+	
 	private HashMap<String, Long> round(HashMap<String, Long> pScores) {
 		HashMap<String, Long> retVal = new HashMap<>();
 		pScores.forEach((k, v) -> {

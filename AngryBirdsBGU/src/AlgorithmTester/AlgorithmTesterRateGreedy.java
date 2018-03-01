@@ -1,10 +1,10 @@
 package AlgorithmTester;
 
+import java.text.ParseException;
 import java.util.HashMap;
 
 import DB.Game;
-import MetaAgent.Distribution;
-import MetaAgent.MyLogger;
+import Distribution.Distribution;
 import MetaAgent.Problem;
 
 public class AlgorithmTesterRateGreedy extends AlgorithmTester {
@@ -14,8 +14,13 @@ public class AlgorithmTesterRateGreedy extends AlgorithmTester {
 	protected boolean _isImprovment;
 
 
-	public AlgorithmTesterRateGreedy(Problem pProblem,boolean isImprovment) throws Exception {
-		super(pProblem);
+	public AlgorithmTesterRateGreedy(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution,
+			boolean isImprovment) throws Exception {
+		super(pProblem,realScoreDistribution,realTimeDistribution,policyScoreDistribution,policyTimeDistribution);
 		mScoresDistribution = getScoresDistribution();
 		mTimeDistribution = getTimeDistribution();
 		_isImprovment = isImprovment;
@@ -30,31 +35,29 @@ public class AlgorithmTesterRateGreedy extends AlgorithmTester {
 
 	@Override
 	protected String getName() {
-		return _isImprovment? "ImprovedRateGreedy" : "RateGreedy";
+		return _isImprovment? "ImprovedRateGreedy"  + getNameExtension() : "RateGreedy"  + getNameExtension();
 	}
 
-	private int getHighestAdditionalUtility(Game pGame, String[] refChoice) {
+	private int getHighestAdditionalUtility(Game pGame, String[] refChoice) throws ParseException {
 		HashMap<String, Long> scores = getLevelsScores(pGame);
 		double[] retVal = {0};
 		refChoice[0] = pGame.agents.iterator().next();
 		refChoice[1] = pGame.levelNames.iterator().next();
-		mScoresDistribution.forEach((agent, v) -> {
-			v.forEach((level, distribution) -> {
-				try {
+		for (String agent : pGame.agents){
+			HashMap<String, Distribution> agentDistribution = mScoresDistribution.get(agent);
+			for (String level : pGame.levelNames){
+				Distribution levelDistribution = agentDistribution.get(level);
 					double[] distribusionOfRematningTime = mTimeDistribution.get(agent).get(level).getExpectationBelowValue(pGame.getTimeLeft());
 					long prevScore = _isImprovment?  scores.get(level) :  0;
-					double exp = distribution.getExpectation(prevScore) * distribusionOfRematningTime[1] / distribusionOfRematningTime[0];
+					double exp = levelDistribution.getExpectation(prevScore) * distribusionOfRematningTime[1] / distribusionOfRematningTime[0];
 					if (exp > retVal[0]) {
 						retVal[0] = exp;
 						refChoice[0] = agent;
 						refChoice[1] = level;
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					MyLogger.log(e);
-				}
-			});
-		});
+			}
+		}
+
 		return (int)retVal[0];
 	}
 }

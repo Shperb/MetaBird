@@ -6,11 +6,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+
 import DB.Game;
+import Distribution.Distribution;import Distribution.ImplicitDistribution;
+
 
 public class MetaAgentDynamicProgramming extends MetaAgent {
-	private HashMap<String, HashMap<String, Distribution>> mScoresDistribution;
-	private HashMap<String, HashMap<String, Distribution>> mTimeDistribution;
+	private HashMap<String, HashMap<String, ImplicitDistribution>> mScoresDistribution;
+	private HashMap<String, HashMap<String, ImplicitDistribution>> mTimeDistribution;
 	private HashMap<ChoiceEvaluation, Long> mCache = new HashMap<>();
 	private boolean mSamplingDistribution = true;
 	private final int mSupportSize = 2;
@@ -154,8 +157,8 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 			return mCache.get(choiceEvaluation);
 		}
 		long retVal = 0;
-		Distribution timeDistribution = mTimeDistribution.get(agent).get(level);
-		Distribution scoreDistribution = mScoresDistribution.get(agent).get(level);
+		ImplicitDistribution timeDistribution = mTimeDistribution.get(agent).get(level);
+		ImplicitDistribution scoreDistribution = mScoresDistribution.get(agent).get(level);
 		Iterator<Integer> timeDistributionIter = timeDistribution.mTally.keySet().iterator();
 		while (timeDistributionIter.hasNext()) {
 			Integer time = timeDistributionIter.next();
@@ -201,8 +204,8 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 			mScoresDistribution.put(agent, new HashMap<>());
 			mTimeDistribution.put(agent, new HashMap<>());
 			mLevels.keySet().forEach(level -> {
-				mScoresDistribution.get(agent).put(level, new Distribution());
-				mTimeDistribution.get(agent).put(level, new Distribution());
+				mScoresDistribution.get(agent).put(level, new ImplicitDistribution());
+				mTimeDistribution.get(agent).put(level, new ImplicitDistribution());
 			});
 		});
 

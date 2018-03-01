@@ -1,12 +1,19 @@
 package AlgorithmTester;
 
+import java.util.HashMap;
+
 import DB.Game;
+import Distribution.Distribution;
 import MetaAgent.Problem;
 
 public class AlgorithmTesterRandom extends AlgorithmTester {
 
-	public AlgorithmTesterRandom(Problem pProblem) throws Exception {
-		super(pProblem);
+	public AlgorithmTesterRandom(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution) throws Exception {
+		super(pProblem,realScoreDistribution,realTimeDistribution,policyScoreDistribution,policyTimeDistribution);
 	}
 
 	@Override
@@ -19,7 +26,7 @@ public class AlgorithmTesterRandom extends AlgorithmTester {
 
 	@Override
 	protected String getName() {
-		return "Random";
+		return "Random" + getNameExtension();
 	}
 
 }

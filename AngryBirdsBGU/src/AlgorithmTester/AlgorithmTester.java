@@ -1,41 +1,40 @@
 package AlgorithmTester;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import Clock.Clock;
 import Clock.ManualClock;
-import DB.DBHandler;
-import DB.Data;
 import DB.Game;
 import DB.Level;
-import DB.ValueExtractor.ValueExtractor;
-import DB.ValueExtractor.ValueExtractorScore;
-import DB.ValueExtractor.ValueExtractorTimeTaken;
-import MetaAgent.Constants;
-import MetaAgent.Distribution;
+import Distribution.Distribution;
 import MetaAgent.MyLogger;
 import MetaAgent.Problem;
 
 public abstract class AlgorithmTester {
-	private HashMap<String, HashMap<String, ArrayList<Integer>>> mScores;
-	private HashMap<String, HashMap<String, ArrayList<Integer>>> mRunTimes;
+	//private HashMap<String, HashMap<String, ArrayList<Integer>>> mScores;
+	//private HashMap<String, HashMap<String, ArrayList<Integer>>> mRunTimes;
+	protected HashMap<String, HashMap<String, Distribution>> mRealScoreDistribution;
+	protected HashMap<String, HashMap<String, Distribution>> mRealRunTimeDistribution;
+	private HashMap<String, HashMap<String, Distribution>> mPolicyScoreDistribution;
+	private HashMap<String, HashMap<String, Distribution>> mPolicyRunTimeDistribution;
 	private ManualClock mClock;
-	private int mResultsPerPair = 10;
 	private Problem mProblem;
 
 	protected abstract String[] getAgentAndLevel(Game pGame,long[] additionalTime) throws Exception;
 	protected abstract String getName();
 
-	public AlgorithmTester(Problem pProblem) throws Exception {
+	public AlgorithmTester(Problem pProblem,HashMap<String,
+			HashMap<String, Distribution>> realScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> realTimeDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyScoreDistribution,
+			HashMap<String, HashMap<String, Distribution>> policyTimeDistribution) throws Exception {
 		mClock = new ManualClock();
 		Clock.setClock(mClock);
 		mProblem = pProblem;
-		init();
+		mRealScoreDistribution = realScoreDistribution;
+		mRealRunTimeDistribution = realTimeDistribution;
+		mPolicyScoreDistribution = policyScoreDistribution;
+		mPolicyRunTimeDistribution = policyTimeDistribution;
 	}
 	
 	public String test(int pRepetitionsCount, String[] refAdditionalData) throws Exception {
@@ -83,13 +82,18 @@ public abstract class AlgorithmTester {
 	};
 	
 	protected HashMap<String, HashMap<String, Distribution>> getScoresDistribution() {
-		return getDistribution(mScores);
+		return mPolicyScoreDistribution;
 	}
 
 	protected HashMap<String, HashMap<String, Distribution>> getTimeDistribution() {
-		return getDistribution(mRunTimes);
+		return mPolicyRunTimeDistribution;
 	}
-
+	
+	protected String getNameExtension(){
+		return "\t"+mPolicyScoreDistribution.values().iterator().next().values().iterator().next().distributionType();
+	}
+	
+	
 	protected long changeTime(long time){
 		return time;
 	}
@@ -106,7 +110,7 @@ public abstract class AlgorithmTester {
 			String levelName = agentAndLevel[1];
 			game.levels.add(new Level(levelName, agent));
 			Level level = game.levels.get(game.levels.size() - 1);
-			int retVal = get(mRunTimes, agent, levelName);
+			int retVal = getRunTime (agent, levelName);
 			timePassed += retVal;
 			mClock.proceed(changeTime(retVal)*1000);
 			level.score = (retVal > game.timeConstraint - timePassed) ? 0 : getScore(agent, levelName);
@@ -115,21 +119,7 @@ public abstract class AlgorithmTester {
 		return game.getScore();
 	}
 	
-	private HashMap<String, HashMap<String, Distribution>> getDistribution(HashMap<String, HashMap<String, ArrayList<Integer>>> pValues) {
-		HashMap<String, HashMap<String, Distribution>> retVal = new HashMap<>();
-		mProblem.agents.forEach(agent->{
-			retVal.put(agent, new HashMap<>());
-			HashMap<String, Distribution> agentDistribution = retVal.get(agent);
-			mProblem.levels.forEach(level->{
-				agentDistribution.put(level, new Distribution());
-				Distribution agent_level_ditribution = agentDistribution.get(level);
-				pValues.get(agent).get(level).forEach(v->{
-					agent_level_ditribution.addTally(v);
-				});
-			});
-		});
-		return retVal;
-	}
+
 	
 //	private final ArrayList<String> getAgentsNames() {
 //		ArrayList<String> retVal = new ArrayList<>();
@@ -140,20 +130,18 @@ public abstract class AlgorithmTester {
 //		return retVal;
 //	}
 	
-	private int getScore(String pAgent, String pLevel) {
-		int retVal = get(mScores, pAgent, pLevel);
+	private int getScore(String pAgent, String pLevel) throws Exception {
+		int retVal = get(mRealScoreDistribution, pAgent, pLevel);
 		return retVal;
 	}
 
-	private int getRunTime(String pAgent, String pLevel) {
-		int retVal = get(mRunTimes, pAgent, pLevel);
+	private int getRunTime(String pAgent, String pLevel) throws Exception {
+		int retVal = get(mRealRunTimeDistribution, pAgent, pLevel);
 		return retVal;
 	}
 
-	private int get(HashMap<String, HashMap<String, ArrayList<Integer>>> pDistribution, String pAgent, String pLevel) {
-		ArrayList<Integer> arr = pDistribution.get(pAgent).get(pLevel);
-		Integer retVal = arr.get((int) (Math.random() * arr.size()));
-		return retVal;
+	private int get(HashMap<String, HashMap<String, Distribution>> pDistribution, String pAgent, String pLevel) throws Exception{
+		return pDistribution.get(pAgent).get(pLevel).drawValue();
 	}
 
 //	private ArrayList<String> selectLevels(ArrayList<String> levelsBank, int pCnt) {
@@ -162,81 +150,5 @@ public abstract class AlgorithmTester {
 //		return new ArrayList<>(Arrays.asList("Level8-1,Levelcherryblossom-4,Level159,Level5-2".split(",")));
 //	}
 
-	private void init() throws Exception {
-		Data data = DBHandler.loadData();
-		
-		mScores = getResults(data, new ValueExtractorScore());
-		mRunTimes = getResults(data, new ValueExtractorTimeTaken());
-	}
-	
-	private HashMap<String, HashMap<String, ArrayList<Integer>>> getResults(Data pData, ValueExtractor pValueExtractor) throws Exception{
-		HashMap<String, HashMap<String, ArrayList<Integer>>> results = new HashMap<>();
-		Exception e[] = {null};
-		mProblem.agents.forEach(agent->{
-			results.put(agent, new HashMap<>());
-			HashMap<String, ArrayList<Integer>> resultsOfAgent = results.get(agent);
-			mProblem.levels.forEach(level->{
-				ArrayList<Integer> resultsOfPair = getResults(pData, agent, level, mResultsPerPair, pValueExtractor);
-				if (resultsOfPair.size() == mResultsPerPair) {
-					resultsOfAgent.put(level, resultsOfPair);
-				}
-				else {
-					e[0] = new Exception("Found " + resultsOfPair.size() + " results for " + agent + ", " + level + " instead of " + mResultsPerPair);
-				}
-			});
-		});		
-		if (e[0] != null) {
-			throw e[0];
-		}
-		return results;
-	}
-	
-	private ArrayList<Integer> getResults(Data data, String agent, String pLevel, int pResultsPerPair, ValueExtractor pExtractor) {
-		ArrayList<Integer> retVal = new ArrayList<>();
-		data.games.forEach(game->{
-			game.levels.forEach(level->{
-				if (level.name.equals(pLevel) && level.agent.equals(agent) && level.isFinished() && retVal.size() < pResultsPerPair) {
-					retVal.add(pExtractor.getValue(level));
-				}
-			});
-		});
-		return retVal;
-	}
-
-	private ArrayList<String> _getLevelsBank() {
-		File folder = new File(Constants.levelsDir);
-		File[] listOfFiles = folder.listFiles();
-		
-		ArrayList<String> retVal = new ArrayList<>();
-		for (int i=0; i<20; i++) {
-			
-			retVal.add(listOfFiles[i*20].toPath().getFileName().toString().replace(".json", ""));
-		}
-
-		return retVal;
-	}
-	
-	
-
-	
-
-
-//	private HashMap<String, HashMap<String, ArrayList<Integer>>> getResultsFromDB(Data pData, valueExtractor pExtractor) throws JsonSyntaxException, IOException {
-//		HashMap<String, HashMap<String, ArrayList<Integer>>> data = new HashMap<>();
-//		pData.games.forEach(game -> {
-//			game.levels.forEach(level -> {
-//				if (level.isFinished()) {
-//					if (!data.containsKey(level.agent)) {
-//						data.put(level.agent, new HashMap<>());
-//					}
-//					HashMap<String, ArrayList<Integer>> agentResults = data.get(level.agent);
-//					if (!agentResults.containsKey(level.name)) {
-//						agentResults.put(level.name, new ArrayList<>());
-//					}
-//					agentResults.get(level.name).add(pExtractor.getValue(level));
-//				}
-//			});
-//		});
-//		return data;
-//	}
 }
+

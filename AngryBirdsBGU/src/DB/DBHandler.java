@@ -72,7 +72,7 @@ public class DBHandler {
 	}
 
 	private static File getFile(String fileName) throws IOException {
-		String dirName = "c:/MetaAgentDB/";
+		String dirName = "c:/MetaAgentDB2/";
 		String FileName = dirName + fileName;
 		File dir = new File(dirName);
 		if (!dir.exists()) {
