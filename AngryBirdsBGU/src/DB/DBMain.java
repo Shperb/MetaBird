@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 public class DBMain {
 
     public static void main(String[] args) throws IOException {
-        filterData();
+        // filterData();
         // filterLevels();
         return;
     }

@@ -20,4 +20,12 @@ public class Features {
     public long numBlueBirds;
     public long numBlackBirds;
     public long numWhiteBirds;
+    public long varietyOfBirds;
+    public long feasibleObjects;
+    public long feasiblePigs;
+    public long roundObjectsNotPigs;
+    public long icedTerritory;
+    public long woodenTerritory;
+    public long stonedTerritory;
+    public long PigsInBlocks;
 }

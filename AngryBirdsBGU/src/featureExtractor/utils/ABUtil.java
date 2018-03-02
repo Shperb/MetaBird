@@ -19,6 +19,12 @@ public class ABUtil {
 	public static int gap = 5; //vision tolerance
 	private static TrajectoryPlanner tp = new TrajectoryPlanner();
 	private static Random randomGenerator = new Random();
+	private static long rolling = 0;
+
+	public static long getRollingItemsNum()
+    {
+        return rolling;
+    }
 
 	/*
 	 * function to detect Scene objects
@@ -75,8 +81,16 @@ public class ABUtil {
 			for (int i=0; i<objects.size(); i++){
 				String test = new String(objects.get(i).type.toString());
 
-				if (test.equals("Stone") && objects.get(i).shape.toString().equals("Circle")) {
-					PigsAndRolling.add(objects.get(i));
+				if (objects.get(i).shape.toString().equals("Circle"))
+				{
+					if (!test.equals("Pig"))
+					{
+						rolling++;
+					}
+					if (test.equals("Stone"))
+					{
+						PigsAndRolling.add(objects.get(i));
+					}
 				}
 				test = null;
 			}
@@ -225,6 +239,12 @@ public class ABUtil {
 
 		return false;
 	}
+
+    // return the area/territory of an object
+    public static long ObjectTerritory(ABObject o1)
+    {
+        return (o1.x+o1.width)*(o1.y+o1.height);
+    }
 
 	//Return true if the target can be hit by releasing the bird at the specified release point
 	public static boolean isReachable(Vision vision, Point target, Shot shot)

@@ -3,6 +3,7 @@ package featureExtractor.demo;
 import DB.Features;
 import Jama.Matrix;
 import featureExtractor.planner.TrajectoryPlanner;
+import featureExtractor.utils.ABUtil;
 import featureExtractor.vision.ABObject;
 import featureExtractor.vision.ABType;
 import org.json.simple.JSONObject;
@@ -14,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static featureExtractor.utils.ABUtil.ObjectTerritory;
 import static featureExtractor.utils.ABUtil.bubblesort;
 import static featureExtractor.utils.ABUtil.isSupport;
 
@@ -30,6 +33,8 @@ public class Tree
     private double width = 0;
     private int objects = 0;
     private int StonedPigs = 0;
+    private int tnts = 0;
+    private long blockedPigs = 0;
 
     // class's constructor
     public Tree(TrajectoryPlanner tp_)
@@ -41,14 +46,9 @@ public class Tree
 
     //Getters
     //ToAdd - total number of birds, how many from each type of birds, how many types
-    //ToAdd -
     //ToAdd - See if i can check the difference in pigs size
-    //ToAdd - getter how many of the pigs with stone
 
-    public long getNumOfRedBirds()
-    {
-        return BirdsListIterator(o -> o.type.name().equals("RedBird"));
-    }
+    public long getNumOfRedBirds() { return BirdsListIterator(o -> o.type.name().equals("RedBird")); }
 
     public long getNumOfYellowBirds()
     {
@@ -70,11 +70,12 @@ public class Tree
         return BirdsListIterator(o -> o.type.name().equals("WhiteBird"));
     }
 
-
     public int getNumOfBirds()
     {
         return birds.size();
     }
+
+    public int CountNonZeroes(long... lst) { int count = 0; for (long item : lst) {if (item>0) count++;}; return count; }
 
     public int getStonedPigs()
     {
@@ -84,6 +85,11 @@ public class Tree
     public int getNoStonePigs()
     {
         return this.pigs - this.StonedPigs;
+    }
+
+    public long getBlockedPigs() //must run after getNumOfBlocks
+    {
+        return blockedPigs;
     }
 
     public long getIce()
@@ -99,6 +105,31 @@ public class Tree
     public long getStone()
     {
         return LevelListIterator(o -> o.type.equals("Stone"));
+    }
+
+    public long getIcedTerritory()
+    {
+        return LevelListSpecialIterator(o -> o.type.equals("Ice"));
+    }
+
+    public long getWoodenTerritory()
+    {
+        return LevelListSpecialIterator(o -> o.type.equals("Wood"));
+    }
+
+    public long getStonedTerritory()
+    {
+        return LevelListSpecialIterator(o -> o.type.equals("Stone"));
+    }
+
+    public long getFeasibleObjects()
+    {
+        return LevelListIterator(o -> (o.feasible && !o.type.equals("Pig")));
+    }
+
+    public long getFeasiblePigs()
+    {
+        return LevelListIterator(o -> (o.feasible && o.type.equals("Pig")));
     }
 
     public double getDensity()
@@ -119,6 +150,16 @@ public class Tree
     public int getNumOfPigs()
     {
         return this.pigs;
+    }
+
+    public int getNumOfTnts()
+    {
+        return this.tnts;
+    }
+
+    public long getNumOfRoundObjectsNotPigs()
+    {
+        return ABUtil.getRollingItemsNum();
     }
 
     public double getWidth()
@@ -142,6 +183,7 @@ public class Tree
         int count = 0;
         int rootx = LevelSize() - 1, rooty = 0;
         ArrayList<Node> rootChildren = GetElement(rootx, rooty).children;
+        ArrayList<Long> inBlockPigs = new ArrayList<Long>();
         //Loop over children
         for (Node child : rootChildren)
         {
@@ -157,8 +199,19 @@ public class Tree
             {
                 count++;
                 getSupporters(child, level_list, potentialBlocks);
+
+                //bonus - also add counting for in-block pigs
+                if (child.type.equals("Pig"))
+                    inBlockPigs.add(potentialBlocks.stream().filter(o -> o.type.equals("Pig")).count() + 1);
+                else
+                {
+                    long tempPigsInBlock  = potentialBlocks.stream().filter(o -> o.type.equals("Pig")).count();
+                    if (tempPigsInBlock > 0)
+                        inBlockPigs.add(tempPigsInBlock + 1);
+                }
             }
         }
+        blockedPigs = (long) Math.ceil(inBlockPigs.stream().mapToDouble(d -> d).average().getAsDouble());
         return count;
     }
 
@@ -340,6 +393,14 @@ public class Tree
         features.numBlueBirds = getNumOfBlueBirds();
         features.numBlackBirds = getNumOfBlackBirds();
         features.numWhiteBirds = getNumOfWhiteBirds();
+        features.varietyOfBirds = CountNonZeroes(features.numRedBirds, features.numYellowBirds, features.numBlueBirds, features.numBlackBirds, features.numWhiteBirds);
+        features.feasibleObjects = getFeasibleObjects();
+        features.feasiblePigs = getFeasiblePigs();
+        features.roundObjectsNotPigs = getNumOfRoundObjectsNotPigs();
+        features.icedTerritory = getIcedTerritory();
+        features.woodenTerritory = getWoodenTerritory();
+        features.stonedTerritory = getStonedTerritory();
+        features.PigsInBlocks = getBlockedPigs(); //must run after getNumOfBlocks
 
         return features;
     }
@@ -816,6 +877,7 @@ public class Tree
         this.width = room.getWidth();
         this.pigs = pigs.size();
         this.objects = PigsObjects.size() - this.pigs;
+        this.tnts = TNT.size();
 
         // Total tree's constructions
         create_level_list(room, PigsObjects, x, y, rootWidth);
@@ -1392,7 +1454,7 @@ public class Tree
     }
 
 
-    //Return a link list of ABObjects that support o1 (test by isSupport function ).
+    //Return a linked list of ABObjects that support o1 (test by isSupport function ).
     //objs refers to a list of potential supporters.
     //Empty list will be returned if no such supporters.
     //Used for getNumOfBlocks
@@ -1467,6 +1529,11 @@ public class Tree
         return rightmost;
     }
 
+    //Iterator for level_list, used for special territory getters
+    private long LevelListSpecialIterator(Predicate<Node> predicate)
+    {
+        return level_list.stream().flatMap(List::stream).filter(o -> o.type.equals("Ice")).map(o->ObjectTerritory(o.obj)).mapToLong(Long::longValue).sum();
+    }
 
     //Iterator for level_list, used for getters
     private long LevelListIterator(Predicate<Node> predicate)
