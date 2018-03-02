@@ -3,8 +3,11 @@ package Distribution;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class DistributionOfDistribution extends Distribution{
 	private HashMap<Distribution, Double> mDistributionsProbabilities;
@@ -84,6 +87,27 @@ public class DistributionOfDistribution extends Distribution{
 	@Override
 	public double getMaxScore() {
 		return mMaxScore;
+	}
+	
+	public SortedMap<Integer,Double> getCDF(){
+		SortedMap<Integer,Double> distribution = new TreeMap<Integer,Double>();
+		for (Entry<Distribution, Double> entry : mDistributionsProbabilities.entrySet()){
+			for (Integer value : entry.getKey().getSupport()){
+				if (distribution.containsKey(value)){
+					distribution.put(value, distribution.get(value)+entry.getValue()*entry.getKey().getLikelihood(value));
+				}
+				else{
+					distribution.put(value, entry.getValue()*entry.getKey().getLikelihood(value));
+				}
+			}
+		}
+		double prevProbability = 0;
+		for (Entry<Integer,Double> entry : distribution.entrySet()){
+			double currentProbability = entry.getValue();
+			distribution.put(entry.getKey(),currentProbability+prevProbability);
+			prevProbability+= currentProbability;
+		}
+		return distribution;
 	}
 
 }

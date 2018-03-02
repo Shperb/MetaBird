@@ -3,6 +3,8 @@ package Distribution;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -50,7 +52,7 @@ public class ImplicitDistribution extends Distribution{
 				totalBelow[0] += entry.getValue();
 			}
 		}
-		ans[0] = sum[0] / totalBelow[0];
+		ans[0] =  (totalBelow[0] ==0 )? 0 : sum[0] / totalBelow[0];
 		ans[1] = totalBelow[0]/getTotalTally();
 		return ans;
 	}
@@ -104,5 +106,19 @@ public class ImplicitDistribution extends Distribution{
 	@Override
 	public double getMaxScore() {
 		return mMaxScore;
+	}
+	
+	public SortedMap<Integer,Double> getCDF(){
+		SortedMap<Integer,Double> distribution = new TreeMap<Integer,Double>();
+		for (Entry<Integer, Integer> entry : mTally.entrySet()){
+			distribution.put(entry.getKey(), (double)entry.getValue()/mTotalTally);
+		}
+		double prevProbability = 0;
+		for (Entry<Integer,Double> entry : distribution.entrySet()){
+			double currentProbability = entry.getValue();
+			distribution.put(entry.getKey(),currentProbability+prevProbability);
+			prevProbability+= currentProbability;
+		}
+		return distribution;
 	}
 }

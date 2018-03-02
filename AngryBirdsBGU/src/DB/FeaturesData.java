@@ -59,4 +59,10 @@ public class FeaturesData {
 	    return popular;
 	}
 	
+	public void printMaxLevelScores(){
+		for (Entry<String,List<Features>> entry : features.entrySet()){
+			System.out.println(entry.getKey() +"\t" + computeMaxScoreBasedOnFeatures(entry.getKey()));
+		}
+	}
+	
 }

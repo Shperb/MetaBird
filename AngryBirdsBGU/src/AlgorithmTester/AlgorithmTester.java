@@ -60,7 +60,7 @@ public abstract class AlgorithmTester {
 		}
 		double additionalTimeInSeconds = additionalTime[0] / 1000.0;
 		refAdditionalData[0] = getAdditionalData();
-		String toWrite = "\t"+((double)(totalTime-additionalTimeInSeconds)/pRepetitionsCount +additionalTimeInSeconds) +"\t"+ "time" +"\t" + mProblem + "\t" + getName() + "\t" + avarageScore + "\t" + variance + "\t" + sum + "\t" + getAdditionalData();
+		String toWrite = "\t"+((double)(totalTime-additionalTimeInSeconds)/pRepetitionsCount +additionalTimeInSeconds) +"\t"+ "time" +"\t" + mProblem + "\t" + getName() + "\t" + avarageScore + "\t" + variance + "\t" + getAdditionalData();
 		System.out.println(toWrite);
 		MyLogger.log(toWrite);
 		return toWrite;

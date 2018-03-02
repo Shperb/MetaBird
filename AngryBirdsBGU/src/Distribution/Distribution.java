@@ -1,6 +1,7 @@
 package Distribution;
 
 import java.util.Set;
+import java.util.SortedMap;
 
 public abstract class Distribution {
 
@@ -12,6 +13,7 @@ public abstract class Distribution {
 	public abstract void round(int pFactor);
 	public abstract String distributionType();
 	public abstract double getMaxScore();
+	public abstract SortedMap<Integer,Double> getCDF();
 	
 	public double getExpectation() {
 		return getExpectation(0);
