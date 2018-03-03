@@ -27,5 +27,6 @@ public class Features {
     public long icedTerritory;
     public long woodenTerritory;
     public long stonedTerritory;
-    public long PigsInBlocks;
+    public long averagePigsInBlocks;
+    public long blocksWithPigs;
 }

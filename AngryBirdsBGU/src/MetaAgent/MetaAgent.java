@@ -51,6 +51,7 @@ public abstract class MetaAgent {
 	public MetaAgent(int pTimeConstraint, String[] pAgents) {
 		Clock.setClock(new SystemClock());
 
+		//TODO - for tests, can add only one of the agents instead of all
 		for (int i=0; i<pAgents.length; i++) {
 			mAgents.add(new Agent(pAgents[i], this));
 		}

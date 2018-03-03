@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -28,6 +29,8 @@ public class Tree
     private TrajectoryPlanner tp;
     private List<ABObject> birds;                       // extra list for birds
 
+    ArrayList<Node> o1supporters = new ArrayList<Node>();
+    ArrayList<Node> o2supporters = new ArrayList<Node>();
     private int pigs = 0;
     private double height = 0;
     private double width = 0;
@@ -35,6 +38,7 @@ public class Tree
     private int StonedPigs = 0;
     private int tnts = 0;
     private long blockedPigs = 0;
+    private long blocksWithPigs = 0;
 
     // class's constructor
     public Tree(TrajectoryPlanner tp_)
@@ -92,44 +96,49 @@ public class Tree
         return blockedPigs;
     }
 
+    public long getBlocksWithPigs() //must run after getNumOfBlocks
+    {
+        return blocksWithPigs;
+    }
+
     public long getIce()
     {
-        return LevelListIterator(o -> o.type.equals("Ice"));
+        return LevelListIterator(o -> o.type.contains("Ice"));
     }
 
     public long getWood()
     {
-        return LevelListIterator(o -> o.type.equals("Wood"));
+        return LevelListIterator(o -> o.type.contains("Wood"));
     }
 
     public long getStone()
     {
-        return LevelListIterator(o -> o.type.equals("Stone"));
+        return LevelListIterator(o -> o.type.contains("Stone"));
     }
 
     public long getIcedTerritory()
     {
-        return LevelListSpecialIterator(o -> o.type.equals("Ice"));
+        return LevelListSpecialIterator(o -> o.type.contains("Ice"));
     }
 
     public long getWoodenTerritory()
     {
-        return LevelListSpecialIterator(o -> o.type.equals("Wood"));
+        return LevelListSpecialIterator(o -> o.type.contains("Wood"));
     }
 
     public long getStonedTerritory()
     {
-        return LevelListSpecialIterator(o -> o.type.equals("Stone"));
+        return LevelListSpecialIterator(o -> o.type.contains("Stone"));
     }
 
     public long getFeasibleObjects()
     {
-        return LevelListIterator(o -> (o.feasible && !o.type.equals("Pig")));
+        return LevelListIterator(o -> (o.feasible && !o.type.contains("Pig")));
     }
 
     public long getFeasiblePigs()
     {
-        return LevelListIterator(o -> (o.feasible && o.type.equals("Pig")));
+        return LevelListIterator(o -> (o.feasible && o.type.contains("Pig")));
     }
 
     public double getDensity()
@@ -179,7 +188,6 @@ public class Tree
 
     public int getNumOfBlocks()
     {
-        ArrayList<Node> potentialBlocks = new ArrayList<Node>();
         int count = 0;
         int rootx = LevelSize() - 1, rooty = 0;
         ArrayList<Node> rootChildren = GetElement(rootx, rooty).children;
@@ -189,29 +197,34 @@ public class Tree
         {
             int shared = 0;
             //if first or empty supporters skip this step
-            if (potentialBlocks.size() != 0)
+            if (o1supporters.size() != 0)
             {
-                shared = compareSupporters(child, level_list, potentialBlocks);
+                shared = compareSupporters(child, level_list);
             }
 
             //if there are no shared supporters, assume new block
             if (shared == 0)
             {
                 count++;
-                getSupporters(child, level_list, potentialBlocks);
+                o1supporters.clear();
+                getSupporterso1(child, level_list);
+                o1supporters.add(child);
 
                 //bonus - also add counting for in-block pigs
-                if (child.type.equals("Pig"))
-                    inBlockPigs.add(potentialBlocks.stream().filter(o -> o.type.equals("Pig")).count() + 1);
-                else
-                {
-                    long tempPigsInBlock  = potentialBlocks.stream().filter(o -> o.type.equals("Pig")).count();
-                    if (tempPigsInBlock > 0)
-                        inBlockPigs.add(tempPigsInBlock + 1);
-                }
+                long tempPigsInBlock  = o1supporters.stream().filter(o -> o.type.contains("Pig")).count();
+                inBlockPigs.add(tempPigsInBlock);
+            }
+            else
+            {
+                long tempPigsInBlock  = o1supporters.stream().filter(o -> o.type.contains("Pig")).count();
+                if (tempPigsInBlock > 0)
+                    inBlockPigs.set((count-1), tempPigsInBlock);
             }
         }
-        blockedPigs = (long) Math.ceil(inBlockPigs.stream().mapToDouble(d -> d).average().getAsDouble());
+
+        inBlockPigs.removeIf(n -> n==0);
+        blockedPigs = (long) Math.round(inBlockPigs.stream().mapToDouble(d -> d).average().getAsDouble());
+        blocksWithPigs = inBlockPigs.size();
         return count;
     }
 
@@ -400,13 +413,14 @@ public class Tree
         features.icedTerritory = getIcedTerritory();
         features.woodenTerritory = getWoodenTerritory();
         features.stonedTerritory = getStonedTerritory();
-        features.PigsInBlocks = getBlockedPigs(); //must run after getNumOfBlocks
+        features.averagePigsInBlocks = getBlockedPigs(); //must run after getNumOfBlocks
+        features.blocksWithPigs = getBlocksWithPigs();
 
         return features;
     }
-    
+
     private String concatStringsAndNextLine (String s,String b){
-        return s + b +"\n"; 
+        return s + b +"\n";
     }
 
     /*
@@ -1437,6 +1451,10 @@ public class Tree
         level_list.clear();
         System.gc();
 
+        o1supporters.clear();
+        o2supporters.clear();
+
+
     }
 
     /*
@@ -1454,11 +1472,34 @@ public class Tree
     }
 
 
-    //Return a linked list of ABObjects that support o1 (test by isSupport function ).
+    //Creates a linked list of ABObjects that support o1 (test by isSupport function ).
     //objs refers to a list of potential supporters.
     //Empty list will be returned if no such supporters.
     //Used for getNumOfBlocks
-    private void getSupporters(Node o2, ArrayList<ArrayList<Node>> level_list, ArrayList<Node> supporters)
+    private void getSupporterso1(Node o1, ArrayList<ArrayList<Node>> level_list)
+    {
+        //Loop through the potential supporters
+        for (int i = o1.level - 1; i >= 0; i--)
+        {
+            for (int j = 0; j < LevelSize(i); j++)
+            {
+                if (isSupport(o1.obj, GetElement(i, j).obj))
+                {
+                    if (!o1supporters.contains(GetElement(i, j)))
+                    {
+                        o1supporters.add(GetElement(i, j));
+                        getSupporterso1(GetElement(i, j), level_list);
+                    }
+                }
+            }
+        }
+    }
+
+    //Creates a linked list of ABObjects that support o2 (test by isSupport function ).
+    //objs refers to a list of potential supporters.
+    //Empty list will be returned if no such supporters.
+    //Used for getNumOfBlocks
+    private void getSupporterso2(Node o2, ArrayList<ArrayList<Node>> level_list)
     {
         //Loop through the potential supporters
         for (int i = o2.level - 1; i >= 0; i--)
@@ -1467,10 +1508,10 @@ public class Tree
             {
                 if (isSupport(o2.obj, GetElement(i, j).obj))
                 {
-                    if (!supporters.contains(GetElement(i, j)))
+                    if (!o2supporters.contains(GetElement(i, j)))
                     {
-                        supporters.add(GetElement(i, j));
-                        getSupporters(GetElement(i, j), level_list, supporters);
+                        o2supporters.add(GetElement(i, j));
+                        getSupporterso2(GetElement(i, j), level_list);
                     }
                 }
             }
@@ -1482,19 +1523,29 @@ public class Tree
     Used for getNumOfBlocks
     returns 1 if there's an intersect, 0 otherwise.
     */
-    private int compareSupporters(Node o2, ArrayList<ArrayList<Node>> level_list, ArrayList<Node> o1supporters)
+    private int compareSupporters(Node o2, ArrayList<ArrayList<Node>> level_list)
     {
+        int sharing = 0;
+
         //get o2 supporters
-        ArrayList<Node> o2Supporters = new ArrayList<Node>();
-        getSupporters(o2, level_list, o2Supporters);
+        getSupporterso2(o2, level_list);
+        o2supporters.add(o2);
 
         //check if any of them is already in o1supportes
-        for (Node o2sup : o2Supporters)
+        for (Node o2sup : o2supporters)
         {
             if (o1supporters.contains(o2sup))
-                return 1;
+            {
+                for (Node o2sup2 : o2supporters)
+                    if (!o1supporters.contains(o2sup2))
+                        o1supporters.add(o2sup2);
+                sharing = 1;
+                break;
+            }
         }
-        return 0;
+        o2supporters.clear();
+
+        return sharing;
     }
 
     /*
@@ -1532,7 +1583,7 @@ public class Tree
     //Iterator for level_list, used for special territory getters
     private long LevelListSpecialIterator(Predicate<Node> predicate)
     {
-        return level_list.stream().flatMap(List::stream).filter(o -> o.type.equals("Ice")).map(o->ObjectTerritory(o.obj)).mapToLong(Long::longValue).sum();
+        return level_list.stream().flatMap(List::stream).filter(predicate).map(o->ObjectTerritory(o.obj)).mapToLong(Long::longValue).sum();
     }
 
     //Iterator for level_list, used for getters

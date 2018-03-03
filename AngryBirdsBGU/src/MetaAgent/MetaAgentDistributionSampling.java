@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MetaAgentDistributionSampling extends MetaAgent {
-	private final int mSamplesPerPair = 12;
+	private final int mSamplesPerPair = 12; //TODO - changeable
 
 	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
 		super(pTimeConstraint, pAgents);
