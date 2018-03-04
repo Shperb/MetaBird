@@ -18,8 +18,9 @@ import DB.FeaturesData;
 import DB.ValueExtractor.ValueExtractor;
 import DB.ValueExtractor.ValueExtractorScore;
 import DB.ValueExtractor.ValueExtractorTimeTaken;
+import Distribution.BinnedDistributionOfDistributions;
 import Distribution.Distribution;
-import Distribution.DistributionOfDistribution;
+import Distribution.DistributionOfDistributions;
 import Distribution.ImplicitDistribution;
 
 public class DistributionExtraction {
@@ -47,40 +48,70 @@ public class DistributionExtraction {
 		mLevels.addAll(mLevelFeatures.keySet());
 	}
 	
+	public DistributionExtraction(List<String> agents,List<String> levels) throws JsonSyntaxException, IOException {
+		this(agents);
+		for (String level: levels){
+			mLevels.remove(level);
+			mLevelFeatures.remove(level);
+			for (HashMap<String, ArrayList<Integer>> scoreMap : mScores.values()){
+				scoreMap.remove(level);
+			}
+			for (HashMap<String, ArrayList<Integer>> timeMap : mRunTimes.values()){
+				timeMap.remove(level);
+			}
+		}
+		
+	}
+	
 
 		
 	public HashMap<String, HashMap<String, Distribution>> getRealScoreDistribution(){
-		return getDistribution(mScores);
+		return getDistribution(mScores,true);
 	}
 	public HashMap<String, HashMap<String, Distribution>> getRealTimeDistribution(){
-		return getDistribution(mRunTimes);
+		return getDistribution(mRunTimes,false);
 	}
 	
 	public List<String> getLevels(){
 		return mLevels;
 	}
 	
-	public HashMap<String, HashMap<String, Distribution>> getPolicyScoreDistribution(int k){
-		return getPolicyDistribution(getRealScoreDistribution(),k);
+	public HashMap<String, HashMap<String, Distribution>> getBinnedPolicyScoreDistribution(int k, double currProb){
+		return getPolicyDistribution(getRealScoreDistribution(),k,currProb,true,true);
 	}
 	
-	public HashMap<String, HashMap<String, Distribution>> getPolicyTimeDistribution(int k){
-		return getPolicyDistribution(getRealTimeDistribution(),k);
+	public HashMap<String, HashMap<String, Distribution>> getBinnedPolicyTimeDistribution(int k,double currProb){
+		return getPolicyDistribution(getRealTimeDistribution(),k,currProb,true,false);
+	}
+	
+	public HashMap<String, HashMap<String, Distribution>> getPolicyScoreDistribution(int k, double currProb){
+		return getPolicyDistribution(getRealScoreDistribution(),k,currProb,false,true);
+	}
+	
+	public HashMap<String, HashMap<String, Distribution>> getPolicyTimeDistribution(int k, double currProb){
+		return getPolicyDistribution(getRealTimeDistribution(),k, currProb,false,false);
 	}
 	
 	public HashMap<String, HashMap<String, Distribution>> getPolicyScoreDistribution(){
-		return getPolicyDistribution(getRealScoreDistribution());
+		return getPolicyDistribution(getRealScoreDistribution(),false,true);
 	}
-
+	
 	private HashMap<String, HashMap<String, Distribution>> getPolicyDistribution(
-			HashMap<String, HashMap<String, Distribution>> distribution) {
-		return getPolicyDistribution(distribution, mLevels.size());
+			HashMap<String, HashMap<String, Distribution>> distribution,boolean isBinned,boolean isScore) {
+		return getPolicyDistribution(distribution, mLevels.size(),0,isBinned,isScore);
+	}
+	
+	public HashMap<String, HashMap<String, Distribution>> getBinnedPolicyScoreDistribution(){
+		return getPolicyDistribution(getRealScoreDistribution(),true,true);
 	}
 
+	public HashMap<String, HashMap<String, Distribution>> getBinnedPolicyTimeDistribution(){
+		return getPolicyDistribution(getRealTimeDistribution(),true,false);
+	}
 
 
 	public HashMap<String, HashMap<String, Distribution>> getPolicyTimeDistribution(){
-		return getPolicyDistribution(getRealTimeDistribution());
+		return getPolicyDistribution(getRealTimeDistribution(),false,false);
 	}
 
 	private void cleanFeatures() {
@@ -148,12 +179,13 @@ public class DistributionExtraction {
 		}
 	}
 	
-	private HashMap<String,Double> computeDistanceFromEachLevel(List<Double> features,HashMap<String,List<Double>> featureSet, int k){
+	private HashMap<String,Double> computeDistanceFromEachLevel(String currlevel, int k, double currProb){
 		HashMap<String,Double> result = new HashMap<>();
+		List<Double> features = mLevelFeatures.get(currlevel);
 		double sumOfDistances = 0;
 		List<Double> maxValues = new ArrayList<Double>();
-		for (String level : featureSet.keySet()) {
-			List<Double> lst = featureSet.get(level);
+		for (String level : mLevelFeatures.keySet()) {
+			List<Double> lst = mLevelFeatures.get(level);
 			for (int i = 0;i<lst.size();i++){
 				if (maxValues.size() <= i){
 					maxValues.add(lst.get(i));
@@ -173,8 +205,8 @@ public class DistributionExtraction {
 			sumOfDistances += toAdd;
 			result.put(level,toAdd);	
 		}*/
-		for (String level : featureSet.keySet()) {
-			double currentDistance = computeDistance(featureSet.get(level),features,maxValues);
+		for (String level : mLevelFeatures.keySet()) {
+			double currentDistance = computeDistance(mLevelFeatures.get(level),features,maxValues);
 			distancePriotiryQueue.add(new LevelDistance(currentDistance, level));	
 		}
 		int count = 0;
@@ -184,26 +216,27 @@ public class DistributionExtraction {
 			if (pair == null){
 				break;
 			}
-			double toAdd = 1/(pair.getDistance()+epsilon);
-			result.put(pair.getLevel(),toAdd);
-			sumOfDistances += toAdd;
-			count++;
+			if (pair.getLevel().equals(currlevel)){
+				result.put(currlevel,currProb);
+			}
+			else{
+				double toAdd = 1/(pair.getDistance()+epsilon);
+				result.put(pair.getLevel(),toAdd);
+				sumOfDistances += toAdd;
+				count++;	
+			}
+
 		}
 		
 		for (String level : result.keySet()) {
-			result.put(level,result.get(level) / sumOfDistances);	
+			if (!level.equals(currlevel)){
+				result.put(level,result.get(level)*(1-currProb) / sumOfDistances);	
+			}
 		}
 		return result;
 
 	}
 	
-	public HashMap<String,Double> computeDistanceFromEachLevel(String level,int k){
-		List<Double> features = mLevelFeatures.get(level);
-		HashMap<String,List<Double>> LevelFeatures = new HashMap<String,List<Double>>(mLevelFeatures);
-		LevelFeatures.remove(level);
-		return (computeDistanceFromEachLevel(features,LevelFeatures,k));
-	}
-
 	private Double computeDistance(List<Double> v, List<Double> features, List<Double> maxValues) {
 		 double Sum = 0.0;
 	        for(int i=0;i<v.size();i++) {
@@ -213,39 +246,47 @@ public class DistributionExtraction {
 	}
 	
 	protected HashMap<String, HashMap<String, Distribution>> getPolicyDistribution(
-			HashMap<String, HashMap<String, Distribution>> distributions,int k) {
+			HashMap<String, HashMap<String, Distribution>> distributions,int k, double currProb,boolean isBinned,boolean isScore) {
 		HashMap<String, HashMap<String, Distribution>> results = new HashMap<String, HashMap<String,Distribution>>();
 		for (String agent : mAgents){
 			HashMap<String, Distribution> agentDistribution = distributions.get(agent);
 			HashMap<String, Distribution> agentNewDistributions = new HashMap<String, Distribution>();
 			for (String level: mLevels){
-				HashMap<String,Double> distance = computeDistanceFromEachLevel(level,k);
+				HashMap<String,Double> distance = computeDistanceFromEachLevel(level,k,currProb);
 				HashMap<Distribution,Double> distributionOfDistributions = new HashMap<Distribution, Double>();
 				for (String lvl : distance.keySet()){
 					
 					distributionOfDistributions.put(agentDistribution.get(lvl), distance.get(lvl));
 				}
-				agentNewDistributions.put(level, new DistributionOfDistribution(distributionOfDistributions,mfeaturesData.computeMaxScoreBasedOnFeatures(level)));
+				double maxValue = isScore? mfeaturesData.computeMaxScoreBasedOnFeatures(level) : 300;
+				if (isBinned){
+					agentNewDistributions.put(level, new BinnedDistributionOfDistributions(distributionOfDistributions,maxValue));
+
+				}
+				else{
+					agentNewDistributions.put(level, new DistributionOfDistributions(distributionOfDistributions,maxValue));
+				}
 			}
 			results.put(agent, agentNewDistributions);
 		}
 		return results;
 	}
-		
-	private HashMap<String, HashMap<String, Distribution>> getDistribution(HashMap<String, HashMap<String, ArrayList<Integer>>> pValues) {
+			
+	private HashMap<String, HashMap<String, Distribution>> getDistribution(HashMap<String, HashMap<String, ArrayList<Integer>>> pValues,boolean isScore) {
 		HashMap<String, HashMap<String, Distribution>> retVal = new HashMap<>();
-		mAgents.forEach(agent->{
+		for(String agent : mAgents){
 			HashMap<String, Distribution> agentMap = new HashMap<String, Distribution>();
 			retVal.put(agent, agentMap);
 			HashMap<String, Distribution> agentDistribution = retVal.get(agent);
-			pValues.get(agent).keySet().forEach(level->{
-				ImplicitDistribution dist = new ImplicitDistribution(mfeaturesData.computeMaxScoreBasedOnFeatures(level));
+			for (String level : pValues.get(agent).keySet()){
+				double maxValue = isScore ? mfeaturesData.computeMaxScoreBasedOnFeatures(level) : 300;
+				ImplicitDistribution dist = new ImplicitDistribution(maxValue);
 				agentDistribution.put(level, dist);
-				pValues.get(agent).get(level).forEach(v->{
+				for (Integer v : pValues.get(agent).get(level)){
 					dist.addTally(v);
-				});
-			});
-		});
+				}
+			}
+		}
 		return retVal;
 	}
 	
@@ -254,21 +295,21 @@ public class DistributionExtraction {
 		printKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution());
 	}
 	
-	public void printKolmogorovDistance(int k){
-		printKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution(k));
-		printKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution(k));
+	public void printKolmogorovDistance(int k,double prob){
+		printKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution(k,prob));
+		printKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution(k,prob));
 	}
 	
-	public double sumKolmogorovDistance(int k){
+	public double sumKolmogorovDistance(int k,double prob){
 		double sum = 0;
-		sum += sumKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution(k));
-		sum += sumKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution(k));
+		sum += sumKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution(k,prob));
+		sum += sumKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution(k,prob));
 		return sum;
 	}
 	
 	public void sumKolmogorovDistanceForAllLevels(){
 		for (int i = 1; i <= mLevels.size(); i++){
-			System.out.println(i + "\t" + sumKolmogorovDistance(i));
+			System.out.println(i + "\t" + sumKolmogorovDistance(i,0));
 		}
 	}
 	
@@ -276,8 +317,8 @@ public class DistributionExtraction {
 	public void printKolmogorovDistanceForAllLevels(){
 		for (int i = 1; i <= mLevels.size(); i++){
 			System.out.println(i);
-			printKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution(i));
-			printKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution(i));
+			printKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution(i,0));
+			printKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution(i,0));
 		}
 	}
 	

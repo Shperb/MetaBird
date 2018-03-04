@@ -12,8 +12,9 @@ public abstract class Distribution {
 	public abstract Set<Integer> getSupport();
 	public abstract void round(int pFactor);
 	public abstract String distributionType();
-	public abstract double getMaxScore();
+	public abstract double getMaxValue();
 	public abstract SortedMap<Integer,Double> getCDF();
+	public abstract void updateProbablity(int value);
 	
 	public double getExpectation() {
 		return getExpectation(0);

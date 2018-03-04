@@ -11,6 +11,7 @@ import java.util.Set;
 public class ImplicitDistribution extends Distribution{
 	public HashMap<Integer, Integer> mTally = new HashMap<>();
 	private double mMaxScore;
+	private SortedMap<Integer,Double> mCDF;
 	
 	private ImplicitDistribution(){
 		
@@ -104,21 +105,31 @@ public class ImplicitDistribution extends Distribution{
 	}
 
 	@Override
-	public double getMaxScore() {
+	public double getMaxValue() {
 		return mMaxScore;
 	}
 	
 	public SortedMap<Integer,Double> getCDF(){
-		SortedMap<Integer,Double> distribution = new TreeMap<Integer,Double>();
-		for (Entry<Integer, Integer> entry : mTally.entrySet()){
-			distribution.put(entry.getKey(), (double)entry.getValue()/mTotalTally);
+		if (mCDF == null){
+			SortedMap<Integer,Double> distribution = new TreeMap<Integer,Double>();
+			for (Entry<Integer, Integer> entry : mTally.entrySet()){
+				distribution.put(entry.getKey(), (double)entry.getValue()/mTotalTally);
+			}
+			double prevProbability = 0;
+			for (Entry<Integer,Double> entry : distribution.entrySet()){
+				double currentProbability = entry.getValue();
+				distribution.put(entry.getKey(),currentProbability+prevProbability);
+				prevProbability+= currentProbability;
+			}
+			mCDF = distribution;
 		}
-		double prevProbability = 0;
-		for (Entry<Integer,Double> entry : distribution.entrySet()){
-			double currentProbability = entry.getValue();
-			distribution.put(entry.getKey(),currentProbability+prevProbability);
-			prevProbability+= currentProbability;
-		}
-		return distribution;
+		
+		return mCDF;
+	}
+
+	@Override
+	public void updateProbablity(int value) {
+		// TODO Auto-generated method stub
+		
 	}
 }

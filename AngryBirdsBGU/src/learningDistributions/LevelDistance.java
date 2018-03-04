@@ -37,7 +37,7 @@ public class LevelDistance implements Comparable<LevelDistance> {
 
 	@Override
     public int compareTo(LevelDistance other) {
-        return other.getDistance().compareTo(this.getDistance());
+        return this.getDistance().compareTo(other.getDistance());
     }
 
 }

@@ -25,6 +25,12 @@ public class AlgorithmTesterRoundRobinGreedy extends AlgorithmTester {
 		selectedPairs = new HashMap<String, List<String>>();
 		_position = 0;
 	}
+	
+	protected void updateScoreProbablity(String agent, String levelName,
+			int value) {
+		mScoresDistribution.get(agent).get(levelName).updateProbablity(value);
+		
+	}
 
 	@Override
 	protected String[] getAgentAndLevel(Game pGame,long[] additionalTime) throws Exception {

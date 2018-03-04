@@ -23,6 +23,12 @@ public class AlgorithmTesterRoundRobinSingleAgent extends AlgorithmTester {
 		_agent = agent;
 		_position = 0;
 	}
+	
+	protected void updateScoreProbablity(String agent, String levelName,
+			int value) {
+		mScoresDistribution.get(agent).get(levelName).updateProbablity(value);
+		
+	}
 
 	@Override
 	protected String[] getAgentAndLevel(Game pGame,long[] additionalTime) throws Exception {

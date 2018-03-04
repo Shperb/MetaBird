@@ -110,11 +110,14 @@ public abstract class AlgorithmTester {
 			String levelName = agentAndLevel[1];
 			game.levels.add(new Level(levelName, agent));
 			Level level = game.levels.get(game.levels.size() - 1);
-			int retVal = getRunTime (agent, levelName);
-			timePassed += retVal;
-			mClock.proceed(changeTime(retVal)*1000);
-			level.score = /*(retVal > game.timeConstraint - timePassed) ? 0 : */getScore(agent, levelName);
+			int retTime = getRunTime (agent, levelName);
+			timePassed += retTime;
+			mClock.proceed(changeTime(retTime)*1000);
+			int retScore = getScore(agent, levelName);
+			level.score = retScore;
 			level.setEndTime();
+			updateScoreProbablity(agent,levelName,retScore);
+			updateTimeProbablity(agent,levelName,retTime);
 		}
 		return game.getScore();
 	}
@@ -129,7 +132,17 @@ public abstract class AlgorithmTester {
 //		retVal.add("AngryBER");
 //		return retVal;
 //	}
-	
+
+	protected void updateTimeProbablity(String agent, String levelName,
+			int retScore) {
+		// TODO Auto-generated method stub
+		
+	}
+	protected void updateScoreProbablity(String agent, String levelName,
+			int retScore) {
+		// TODO Auto-generated method stub
+		
+	}
 	private int getScore(String pAgent, String pLevel) throws Exception {
 		int retVal = get(mRealScoreDistribution, pAgent, pLevel);
 		return retVal;

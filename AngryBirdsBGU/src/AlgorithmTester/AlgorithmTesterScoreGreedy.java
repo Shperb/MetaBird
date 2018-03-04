@@ -21,6 +21,12 @@ public class AlgorithmTesterScoreGreedy extends AlgorithmTester {
 		mScoresDistribution = getScoresDistribution();
 		_isImprovment = isImprovment;
 	}
+	
+	protected void updateScoreProbablity(String agent, String levelName,
+			int value) {
+		mScoresDistribution.get(agent).get(levelName).updateProbablity(value);
+		
+	}
 
 	@Override
 	protected String[] getAgentAndLevel(Game pGame,long[] additionalTime) throws Exception {
