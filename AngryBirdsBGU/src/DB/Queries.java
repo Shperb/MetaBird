@@ -9,6 +9,7 @@ import java.util.HashSet;
 import com.google.gson.JsonSyntaxException;
 
 import DB.ValueExtractor.ValueExtractor;
+import external.ClientMessageTable;
 
 public class Queries {
 
@@ -128,5 +129,25 @@ public class Queries {
 			});
 			System.out.println();
 		});
+	}
+	
+	public void getShotTypes(Data pData) {
+		HashSet<ClientMessageTable> shotTypes = new HashSet<>();
+		HashSet<Integer> paremLength = new HashSet<>();
+		for (Game game : pData.games) {
+			for (Level level : game.levels) {
+				for (Shot shot : level.shots) {
+					shotTypes.add(shot.shotType);
+					paremLength.add(shot.params.length);
+				}
+			}
+		}
+		
+		for (ClientMessageTable shotType : shotTypes) {
+			System.out.println(shotType);
+		}
+		for (Integer len : paremLength) {
+			System.out.println(len);
+		}
 	}
 }

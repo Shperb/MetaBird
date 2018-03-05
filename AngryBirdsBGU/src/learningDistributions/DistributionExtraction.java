@@ -31,6 +31,7 @@ public class DistributionExtraction {
 	protected FeaturesData mfeaturesData;
 	protected List<String> mAgents;
 	protected List<String> mLevels;
+	private double[] mFeaturesWeights = null;
 	
 	public DistributionExtraction(List<String> agents) throws JsonSyntaxException, IOException {
 		FeaturesData featuresData = DBHandler.loadFeatures();
@@ -61,9 +62,11 @@ public class DistributionExtraction {
 			}
 		}
 		
-	}
+	}	
 	
-
+	public void setFeaturesWeights(double[] pFeaturesWeights) {
+		mFeaturesWeights = pFeaturesWeights;
+	}
 		
 	public HashMap<String, HashMap<String, Distribution>> getRealScoreDistribution(){
 		return getDistribution(mScores,true);
@@ -178,11 +181,11 @@ public class DistributionExtraction {
 			}
 		}
 	}
-	
 	private HashMap<String,Double> computeDistanceFromEachLevel(String currlevel, int k, double currProb){
-		HashMap<String,Double> result = new HashMap<>();
-		List<Double> features = mLevelFeatures.get(currlevel);
-		double sumOfDistances = 0;
+		return computeDistanceFromEachLevel(currlevel, k, currProb, true);
+	}
+	
+	private List<Double> getMaxFeaturesValues() {
 		List<Double> maxValues = new ArrayList<Double>();
 		for (String level : mLevelFeatures.keySet()) {
 			List<Double> lst = mLevelFeatures.get(level);
@@ -197,7 +200,15 @@ public class DistributionExtraction {
 				}
 			}	
 		}
+		return maxValues;		
+	}
+	
+	private HashMap<String,Double> computeDistanceFromEachLevel(String currlevel, int k, double currProb, boolean pNormalize){
+		HashMap<String,Double> result = new HashMap<>();
+		List<Double> features = mLevelFeatures.get(currlevel);
+		double sumOfDistances = 0;
 		PriorityQueue<LevelDistance> distancePriotiryQueue =new PriorityQueue<LevelDistance>();
+		List<Double> maxValues = getMaxFeaturesValues();
 	/*	for (String level : featureSet.keySet()) {
 			double currentDistance = computeDistance(featureSet.get(level),features,maxValues);
 			distancePriotiryQueue.add(new LevelDistance(currentDistance, level));
@@ -206,7 +217,7 @@ public class DistributionExtraction {
 			result.put(level,toAdd);	
 		}*/
 		for (String level : mLevelFeatures.keySet()) {
-			double currentDistance = computeDistance(mLevelFeatures.get(level),features,maxValues);
+			double currentDistance = computeDistance(mLevelFeatures.get(level),features, maxValues);
 			distancePriotiryQueue.add(new LevelDistance(currentDistance, level));	
 		}
 		int count = 0;
@@ -228,19 +239,28 @@ public class DistributionExtraction {
 
 		}
 		
-		for (String level : result.keySet()) {
-			if (!level.equals(currlevel)){
-				result.put(level,result.get(level)*(1-currProb) / sumOfDistances);	
+		if (pNormalize) {
+			for (String level : result.keySet()) {
+				if (!level.equals(currlevel)){
+					result.put(level,result.get(level)*(1-currProb) / sumOfDistances);	
+				}
 			}
 		}
 		return result;
 
 	}
 	
+	public Double computeDistance(String pLevel1, String pLevel2) {
+		List<Double> features1 = mLevelFeatures.get(pLevel1);
+		List<Double> features2 = mLevelFeatures.get(pLevel2);
+		return computeDistance(features1, features2, getMaxFeaturesValues());
+	}
+	
 	private Double computeDistance(List<Double> v, List<Double> features, List<Double> maxValues) {
 		 double Sum = 0.0;
 	        for(int i=0;i<v.size();i++) {
-	           Sum = Sum + Math.pow(Math.abs((v.get(i)-features.get(i))/(maxValues.get(i)+epsilon)),2.0);
+	        	double weight = (mFeaturesWeights != null) ? mFeaturesWeights[i] : 1;
+	           Sum = Sum + weight * Math.pow(Math.abs((v.get(i)-features.get(i))/(maxValues.get(i)+epsilon)),2.0);
 	        }
 	        return Math.sqrt(Sum);
 	}
@@ -289,10 +309,41 @@ public class DistributionExtraction {
 		}
 		return retVal;
 	}
+
+	public void printExpectedMaxDistance(){
+		System.out.println("score");
+		printExpectedMaxDistance(getRealScoreDistribution());
+		System.out.println("time");
+		printExpectedMaxDistance(getRealTimeDistribution());
+	}
+	
+	public void printExpectedMaxDistance(HashMap<String, HashMap<String, Distribution>> pDistribution){
+		for (String agent : mAgents) {
+			for (String level1 : mLevels) {
+				for (String level2 : mLevels) {
+					if (!level1.equals(level2)) {
+						double dist = pDistribution.get(agent).get(level1).getExpectedMaxDistance(pDistribution.get(agent).get(level2));
+						System.out.println(agent + '\t' + level1 + "\t" + level2 + "\t" + dist);
+					}
+				}
+			}
+		}
+	}
 	
 	public void printKolmogorovDistance(){
-		printKolmogorovDistance(getRealScoreDistribution(),getPolicyScoreDistribution());
-		printKolmogorovDistance(getRealTimeDistribution(),getPolicyTimeDistribution());
+		System.out.println("features distances");
+		for (String level : mLevels) {
+			HashMap<String, Double> dist = computeDistanceFromEachLevel(level, Integer.MAX_VALUE, 0, false);
+			for (String level2 : dist.keySet()) {
+				if (!level.equals(level2)) {
+					System.out.println(level + "\t" + level2 + "\t" + dist.get(level2));
+				}
+			}
+		}
+		System.out.println("score");
+		printKolmogorovDistance(getRealScoreDistribution());
+		System.out.println("time");
+		printKolmogorovDistance(getRealTimeDistribution());
 	}
 	
 	public void printKolmogorovDistance(int k,double prob){
@@ -335,6 +386,27 @@ public class DistributionExtraction {
 			}
 		}
 		
+	}
+
+	public void printKolmogorovDistances(){
+		printKolmogorovDistance(getRealScoreDistribution());
+		printKolmogorovDistance(getRealTimeDistribution());
+	}
+	
+	private void printKolmogorovDistance(
+			HashMap<String, HashMap<String, Distribution>> pDistributions) {
+		for (Entry<String, HashMap<String, Distribution>> agentEntry: pDistributions.entrySet()){
+			for (Entry<String, Distribution> level1Entry: agentEntry.getValue().entrySet()){
+				for (Entry<String, Distribution> level2Entry: agentEntry.getValue().entrySet()){
+					if (level1Entry != level2Entry) {
+						SortedMap<Integer, Double> CDF1 =level1Entry.getValue().getCDF();
+						SortedMap<Integer, Double> CDF2 =level2Entry.getValue().getCDF();
+						double distance = computeKolmogorovDistanceForSingleLevel(CDF1,CDF2);
+						System.out.println(agentEntry.getKey()+"\t"+ level1Entry.getKey()+"\t"+ level2Entry.getKey()+ "\t"+distance);
+					}
+				}
+			}
+		}		
 	}
 	
 	private double sumKolmogorovDistance(

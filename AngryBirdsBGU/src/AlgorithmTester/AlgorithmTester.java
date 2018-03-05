@@ -1,11 +1,18 @@
 package AlgorithmTester;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.google.gson.JsonSyntaxException;
 
 import Clock.Clock;
 import Clock.ManualClock;
+import DB.DBHandler;
+import DB.Data;
 import DB.Game;
 import DB.Level;
+import DB.Shot;
 import Distribution.Distribution;
 import MetaAgent.MyLogger;
 import MetaAgent.Problem;
@@ -65,6 +72,16 @@ public abstract class AlgorithmTester {
 		MyLogger.log(toWrite);
 		return toWrite;
 	}
+	
+	public double getAverageScore(int pRepetitionsCount) throws Exception {
+		long[] additionalTime = new long[1];
+		double avarageScore = 0;
+		for (int i=0; i<pRepetitionsCount; i++) {
+			long gameScore = test(additionalTime);
+			avarageScore = (1.0/(i+1))*(gameScore + i * avarageScore );
+		}
+		return avarageScore;
+	}	
 	
 	protected String getAdditionalData() {
 		return "";
@@ -143,6 +160,26 @@ public abstract class AlgorithmTester {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	protected Shot getShot(String agent, String pLevel) throws JsonSyntaxException, IOException {
+		HashMap<String, HashMap<String, ArrayList<Shot>>> shots = new HashMap<>();
+		Data data = DBHandler.loadData();
+		for (Game game : data.games) {
+			for (Level level : game.levels) {
+				for (Shot shot : level.shots) {
+					if (!shots.containsKey(shot.agent)) {
+						shots.put(agent, new HashMap<>());
+					}
+					HashMap<String, ArrayList<Shot>> agentShots = shots.get(agent);
+					if (!agentShots.containsKey(level.name)){
+						agentShots.put(level.name, new ArrayList<>());
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	private int getScore(String pAgent, String pLevel) throws Exception {
 		int retVal = get(mRealScoreDistribution, pAgent, pLevel);
 		return retVal;
