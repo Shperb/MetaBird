@@ -236,22 +236,6 @@ public class ABUtil {
 		return false;
 	}
 
-	// If o1 touches o2 from its side, return true.
-	public static boolean isTouching(ABObject o2, ABObject o1)
-	{
-		if(o2.x == o1.x && o2.y == o1.y && o2.width == o1.width && o2.height == o1.height)
-			return true; //o1 touches itself
-
-		int ex_o1 = o1.x + o1.width;
-		int ex_o2 = o2.x + o2.width;
-
-		int ey_o2 = o2.y + o2.height;
-		if(!(o2.x - ex_o1  > gap || o1.x - ex_o2 > gap ))
-			return true;
-
-		return false;
-	}
-
     // return the area/territory of an object
     public static long ObjectTerritory(ABObject o1)
     {

@@ -37,6 +37,7 @@ public class DBMain {
         }
     }
 
+    //this deletes from the data file levels that are not in the folder. should run after re-putting the original levels in fp;der
     private static void filterData() throws IOException {
         Clock.setClock(new SystemClock());
         Data data = DBHandler.loadData();

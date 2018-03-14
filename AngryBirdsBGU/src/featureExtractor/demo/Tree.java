@@ -223,7 +223,7 @@ public class Tree
         }
 
         inBlockPigs.removeIf(n -> n==0);
-        blockedPigs = (long) Math.round(inBlockPigs.stream().mapToDouble(d -> d).average().getAsDouble());
+        blockedPigs =   (long) Math.round(inBlockPigs.stream().mapToDouble(d -> d).average().getAsDouble());
         blocksWithPigs = inBlockPigs.size();
         return count;
     }
