@@ -59,7 +59,7 @@ public class DBMain {
 
                 g.levels.stream()
                         .filter(l ->
-                                filteredLevels.contains(l.name) &&
+                                // filteredLevels.contains(l.name) &&
                                         (l.state == LevelState.won || l.state == LevelState.lost)
                         )
                         .forEach(l -> game.levels.add(l));
@@ -80,9 +80,9 @@ public class DBMain {
             return filteredLevels;
         }
         g.levelNames.forEach(level -> {
-            if (levels.contains(level)) {
+            // if (levels.contains(level)) {
                 filteredLevels.add(level);
-            }
+            // }
         });
 
         return filteredLevels;
