@@ -200,12 +200,13 @@ public abstract class MetaAgent {
 			System.out.println("agent is not playing");
 			getLevel().state = LevelState.stoped_not_playing;
 			state = GameState.LOST;
-		} else if (scoreNotChanging()) {
+		} /* else if (scoreNotChanging()) {
 			MyLogger.log("score not changing");
 			System.out.println("score not changing");
 			getLevel().state = LevelState.stoped_score_not_changing;
 			state = GameState.LOST;
-		} else {
+		} */
+		else {
 			state = getGameState();
 			if (state == GameState.WON) {
 				getLevel().state = LevelState.won;
