@@ -21,8 +21,6 @@ import DB.Game;
 import DB.Level;
 import DB.LevelState;
 import DB.Shot;
-import Distribution.Distribution;
-import Distribution.ImplicitDistribution;
 import ab.vision.GameStateExtractor;
 import ab.vision.GameStateExtractor.GameState;
 import external.ClientMessageEncoder;
@@ -38,7 +36,7 @@ public abstract class MetaAgent {
 	protected Data mData;
 	protected HashMap<String, Integer> mLevels = new HashMap<>();
 
-	private Proxy mProxy;
+	protected Proxy mProxy;
 	private ArrayList<Agent> mAgents = new ArrayList<>();
 	private int mTimeConstraint;
 	ServerSocket mServerSocket;
@@ -46,12 +44,15 @@ public abstract class MetaAgent {
 	abstract protected String getAlgorithmName();
 
 	abstract protected String[] GetNewAgentAndLevel() throws Exception;
-	
+
 	abstract protected boolean shouldStartNewGame();
-	
+
 	abstract protected boolean shouldExit();
-	
+
 	abstract protected ArrayList<String> getLevelsList();
+
+	// Override if needed
+	protected void actAfterLevelFinished(String mCurrentLevel, int score) {	}
 
 	public MetaAgent(int pTimeConstraint, String[] pAgents) {
 		Clock.setClock(new SystemClock());
@@ -63,22 +64,22 @@ public abstract class MetaAgent {
 		mTimeConstraint = pTimeConstraint;
 	}
 
-	private void selectLevels() throws Exception {
+	protected void selectLevels() throws Exception {
 		ArrayList<String> levelsList = getLevelsList();
 		if (levelsList.size() > 8) {
 			throw new Exception("Can't choose more than 8 levels");
 		}
-		
+
 		String message = Constants.newGameMessage + String.join(",", levelsList);
-		
+
 		System.out.println(message);
 		MyLogger.log(message);
-		
+
 		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
 		byte[] configureResult = configure(Utils.intToByteArray(1000));
 		mProxy.setConfigureResult(configureResult);
 		getMyScore();// getMyScore waits for "start" button to be clicked on the server window
-		
+
 		mLevels.clear();
 		levelsList.forEach(l->{
 			mLevels.put(l, mLevels.size() + 1);
@@ -217,11 +218,14 @@ public abstract class MetaAgent {
 		// if (GameState.WON != mLastGameState && GameState.LOST != mLastGameState) {
 		if (GameState.WON == state || GameState.LOST == state) {
 			MyLogger.log("GameState: " + state.name());
+			int score = 0;
 			if (GameState.WON == state) {
-				getLevel().score = getScore(true);
+				score = getScore(true);
+				getLevel().score = score;
 			}
 			getLevel().setEndTime();
 			DBHandler.saveData(mData);
+			actAfterLevelFinished(this.mCurrentLevel, score);
 			System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
 					+ getTimeConstraint());
 			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
@@ -324,7 +328,7 @@ public abstract class MetaAgent {
 
 	}
 
-	GameState getGameState() throws IOException {
+	protected GameState getGameState() throws IOException {
 		GameState state = GameState.UNKNOWN;
 		try {
 			mProxy.mConnectionToServer.write(ClientMessageEncoder.getState());

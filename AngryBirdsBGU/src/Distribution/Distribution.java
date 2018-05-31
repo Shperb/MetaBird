@@ -18,5 +18,9 @@ public abstract class Distribution {
 	
 	public double getExpectation() {
 		return getExpectation(0);
-	}	
+	}
+
+	public double getExpectedMaxDistance(Distribution distribution) {
+		return 0;
+	}
 }

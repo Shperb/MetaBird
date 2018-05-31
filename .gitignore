@@ -23,3 +23,5 @@ out/
 ABServer/.idea/
 ServerWraper/.idea/
 ServerWraper/src/META-INF/MANIFEST.MF
+agents/naive/.idea/misc.xml
+.idea/

@@ -22,8 +22,13 @@ public class Event {
 		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	}
 
-	public long getTimeElapsed() throws ParseException {
-		long begin = getSimpleDateFormat().parse(beginTime).getTime();
+	public long getTimeElapsed() {
+		long begin = 0;
+		try {
+			begin = getSimpleDateFormat().parse(beginTime).getTime();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		long now = Clock.getClock().getTime();
 		return (now - begin) / 1000;
 	}

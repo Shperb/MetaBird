@@ -88,12 +88,7 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 				while (mGeneratePolicy) {
 					System.out.println("generating policy");
 					int horizon = mMaxHorizon;
-					try {
-						horizon = (int) Math.min(mMaxHorizon, getGame().getTimeLeft() - 30);
-					} catch (ParseException e) {
-						MyLogger.log(e);
-						e.printStackTrace();
-					}
+					horizon = (int) Math.min(mMaxHorizon, getGame().getTimeLeft() - 30);
 					if (horizon < 0) {
 						mGeneratePolicy = false;
 					}

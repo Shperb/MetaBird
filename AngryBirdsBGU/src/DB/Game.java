@@ -18,7 +18,7 @@ public class Game extends Event{
 		timeConstraint = pTimeConstraint;
 	}
 
-	public long getTimeLeft() throws ParseException {
+	public long getTimeLeft() {
 		return timeConstraint - getTimeElapsed();
 	}
 

@@ -1,7 +1,6 @@
 package DB;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Features {
@@ -59,5 +58,7 @@ public class Features {
 		return (numBirds-1)*10000+ numPigs*5200+(stoneObjects+woodObjects+iceObjects)*1250;
 	}
 
-
+    public long getMaxScore() {
+		return (numBirds - 1) * 10000 + numPigs * 5300 + (stoneObjects + woodObjects + iceObjects) * 1250;
+	}
 }
