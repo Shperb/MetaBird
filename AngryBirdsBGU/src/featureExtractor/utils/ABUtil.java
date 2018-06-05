@@ -19,6 +19,12 @@ public class ABUtil {
 	public static int gap = 5; //vision tolerance
 	private static TrajectoryPlanner tp = new TrajectoryPlanner();
 	private static Random randomGenerator = new Random();
+	private static long rolling = 0;
+
+	public static long getRollingItemsNum()
+    {
+        return rolling;
+    }
 
 	/*
 	 * function to detect Scene objects
@@ -75,8 +81,16 @@ public class ABUtil {
 			for (int i=0; i<objects.size(); i++){
 				String test = new String(objects.get(i).type.toString());
 
-				if (test.equals("Stone") && objects.get(i).shape.toString().equals("Circle")) {
-					PigsAndRolling.add(objects.get(i));
+				if (objects.get(i).shape.toString().equals("Circle"))
+				{
+					if (!test.equals("Pig"))
+					{
+						rolling++;
+					}
+					if (test.equals("Stone"))
+					{
+						PigsAndRolling.add(objects.get(i));
+					}
 				}
 				test = null;
 			}
@@ -206,25 +220,27 @@ public class ABUtil {
 		return (new Rectangle(xmin,ymin,w,h));
 	}
 
-	// If o1 supports o2, return true
+	// If o1 supports o2, return true. ACTUALLY this is modified - so it checks if it is underneath and not only support!
 	public static boolean isSupport(ABObject o2, ABObject o1)
 	{
 		if(o2.x == o1.x && o2.y == o1.y && o2.width == o1.width && o2.height == o1.height)
-			return false;
+			return true; //o1 supports itself
 
 		int ex_o1 = o1.x + o1.width;
 		int ex_o2 = o2.x + o2.width;
 
 		int ey_o2 = o2.y + o2.height;
-		if(
-				(Math.abs(ey_o2 - o1.y) < gap)
-						&&
-						!( o2.x - ex_o1  > gap || o1.x - ex_o2 > gap )
-				)
+		if(!( o2.x - ex_o1  > gap || o1.x - ex_o2 > gap ))
 			return true;
 
 		return false;
 	}
+
+    // return the area/territory of an object
+    public static long ObjectTerritory(ABObject o1)
+    {
+        return (o1.x+o1.width)*(o1.y+o1.height);
+    }
 
 	//Return true if the target can be hit by releasing the bird at the specified release point
 	public static boolean isReachable(Vision vision, Point target, Shot shot)
