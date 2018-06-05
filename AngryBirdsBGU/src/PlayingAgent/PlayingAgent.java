@@ -55,15 +55,20 @@ public class PlayingAgent extends MetaAgent {
 
     @Override
     protected void selectLevels() throws Exception {
+        byte[] configureResult = configure(Utils.intToByteArray(1000));
+        mProxy.setConfigureResult(configureResult);
+        getMyScore();// getMyScore waits for "start" button to be clicked on the server window
+
         if (this.featureExtractor == null) {
             this.featureExtractor = new FeatureExctractor(this, super.mProxy);
         }
 
         Features features;
         for (int i = 0; i < NUM_LEVELS; i++) {
-            String pLevelName = String.valueOf(i);
-            super.mLevels.put(pLevelName, i);
-            this.loadLevelForFeatureExtraction(++currLevel);
+            ++currLevel;
+            String pLevelName = String.valueOf(currLevel);
+            super.mLevels.put(pLevelName, currLevel);
+            this.loadLevelForFeatureExtraction(currLevel);
             features = this.featureExtractor.growTreeAndReturnFeatures();
             this.levelPredictions.put(currLevel, new LevelPrediction(pLevelName, features));
         }
