@@ -6,7 +6,7 @@ public class TimeDistribution {
         return 0.5;
     }
 
-    public static double getExpectation() {
+    public static double getExpectationBelowValue(long remainingTime) {
         return 30;
     }
 }

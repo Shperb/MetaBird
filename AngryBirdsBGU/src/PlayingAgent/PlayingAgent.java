@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class PlayingAgent extends MetaAgent {
     private final int NUM_LEVELS = 8;
     private HashMap<Integer, LevelPrediction> levelPredictions = new HashMap<>();
-    private int currLevel = 0;
+    private int currLevel = 1;
 
     private FeatureExctractor featureExtractor;
 
@@ -71,12 +71,21 @@ public class PlayingAgent extends MetaAgent {
         }
 
         Features features;
-        for (int i = 0; i < NUM_LEVELS; i++) {
-            ++currLevel;
+        int firstLevelForFeatureExtraction = currLevel;
+        for (; currLevel < firstLevelForFeatureExtraction + NUM_LEVELS; currLevel++) {
             String pLevelName = String.valueOf(currLevel);
             super.mLevels.put(pLevelName, currLevel);
             this.loadLevelForFeatureExtraction(currLevel);
-            features = this.featureExtractor.growTreeAndReturnFeatures();
+            try{
+                features = this.featureExtractor.growTreeAndReturnFeatures();
+            }
+            catch (Exception e){
+                System.out.println("*****************************************************************************");
+                System.out.println("Failed to extract features for level " + pLevelName);
+                System.out.println("Saving features as null and this level will get the lowest score time rate");
+                System.out.println("******************************************************************************");
+                features = null;
+            }
             this.levelPredictions.put(currLevel, new LevelPrediction(pLevelName, features));
         }
 

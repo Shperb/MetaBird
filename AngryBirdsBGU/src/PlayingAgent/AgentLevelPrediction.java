@@ -1,19 +1,18 @@
 package PlayingAgent;
 
-import DB.Features;
 import Utils.DistributionHelper;
 
 public class AgentLevelPrediction {
 
-    private Features features;
+    private final long maxScore;
 
     private double[] scoreBucketsDistribution;
     private TimeDistribution predictedTime;
 
-    public AgentLevelPrediction(Features features, double[] scoreBucketsDistribution, TimeDistribution predictedTime) {
-        this.features = features;
+    public AgentLevelPrediction(long maxScore, double[] scoreBucketsDistribution, TimeDistribution predictedTime) {
         this.scoreBucketsDistribution = scoreBucketsDistribution;
         this.predictedTime = predictedTime;
+        this.maxScore = maxScore;
     }
 
     public double[] getScoreBucketsDistribution() {
@@ -24,15 +23,22 @@ public class AgentLevelPrediction {
         return predictedTime;
     }
 
-    public long getScoreExpectation() {
-        double expectedScorePercentage = DistributionHelper.getBucketsExpectation(this.scoreBucketsDistribution);
-        return (long) (expectedScorePercentage * features.getMaxScore());
+    public double getScoreTimeRate(long remainingTime, int currentScore) {
+        double probabilityAboveCurrScore = getProbabilityAboveScore(currentScore);
+        double expectationAboveScore = getExpectationAboveScore(currentScore, probabilityAboveCurrScore);
+        double probabilityBelowRemainingTime = this.predictedTime.getProbabilityBelowValue(remainingTime);
+        double scoreTimeRate = ((expectationAboveScore - currentScore) * probabilityAboveCurrScore * probabilityBelowRemainingTime)
+                / TimeDistribution.getExpectationBelowValue(remainingTime);
+        System.out.println("Score time rate above " + currentScore + " score with" + remainingTime + "remaining time is: " + scoreTimeRate);
+        return scoreTimeRate;
     }
 
-    public double getScoreTimeRate(long remainingTime, int currentScore) {
-        return
-                ((getScoreExpectation() - currentScore)
-                        * this.predictedTime.getProbabilityBelowValue(remainingTime))
-                        / TimeDistribution.getExpectation();
+    private double getExpectationAboveScore(int currentScore, double probabilityAboveCurrScore) {
+        return this.maxScore *
+                DistributionHelper.getExpectationAboveRelativeScore(this.scoreBucketsDistribution, currentScore / (double) this.maxScore, probabilityAboveCurrScore);
+    }
+
+    private double getProbabilityAboveScore(int currentScore) {
+        return DistributionHelper.getProbabilityAboveRelativeScore(this.scoreBucketsDistribution, currentScore / (double) this.maxScore);
     }
 }
