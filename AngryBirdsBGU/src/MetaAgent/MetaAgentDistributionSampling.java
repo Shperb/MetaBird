@@ -46,28 +46,29 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 	
 	@Override
 	protected ArrayList<String> getLevelsList() {
-		File folder = new File(Constants.levelsDir);
-		File[] listOfFiles = folder.listFiles();
-		shuffle(listOfFiles);
-
-		File[] shortListOfFiles = new File[20];
-
-		for (int i=0; i<20; i++) {
-			shortListOfFiles[i] = listOfFiles[i];
-		}
-
-		ArrayList<String> retVal = new ArrayList<>();
-		for (int i = 0; i < shortListOfFiles.length && retVal.size() < 8; i++) {
-			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
-			if (isRequired(level)) {
-				retVal.add(level);
-			}
-			else{
-				shortListOfFiles[i].delete();
-			}
-		}
-		
-		return retVal;		
+		return new ArrayList<String>(Arrays.asList("Level1-1", "Level1-2","Level1-3","Level1-4","Level1-5","Level1-6","Level1-7","Level1-8"));
+//		File folder = new File(Constants.levelsDir);
+//		File[] listOfFiles = folder.listFiles();
+//		shuffle(listOfFiles);
+//
+//		File[] shortListOfFiles = new File[20];
+//
+//		for (int i=0; i<20; i++) {
+//			shortListOfFiles[i] = listOfFiles[i];
+//		}
+//
+//		ArrayList<String> retVal = new ArrayList<>();
+//		for (int i = 0; i < shortListOfFiles.length && retVal.size() < 8; i++) {
+//			String level = shortListOfFiles[i].toPath().getFileName().toString().replace(".json", "");
+//			if (isRequired(level)) {
+//				retVal.add(level);
+//			}
+//			else{
+//				shortListOfFiles[i].delete();
+//			}
+//		}
+//
+//		return retVal;
 	}
 
 	@Override

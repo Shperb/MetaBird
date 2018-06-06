@@ -9,7 +9,7 @@ import external.ClientMessageTable;
 
 public class MyConnectionToClient extends MyConnection {
 
-	private final boolean showAgentsCmd = true;
+	private final boolean showAgentsCmd = false;
 
 	public MyConnectionToClient(String pExecutableFileName, ServerSocket pServerSocket) throws IOException {
 		String dir = "c:/temp/" + pExecutableFileName;
