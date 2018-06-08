@@ -2,7 +2,7 @@ package PlayingAgent;
 
 import Utils.DistributionHelper;
 
-public class AgentLevelPrediction {
+public class AgentLevelPrediction implements ScoreTimeRateCalculator {
 
     private final long maxScore;
 
@@ -13,14 +13,6 @@ public class AgentLevelPrediction {
         this.scoreBucketsDistribution = scoreBucketsDistribution;
         this.predictedTime = predictedTime;
         this.maxScore = maxScore;
-    }
-
-    public double[] getScoreBucketsDistribution() {
-        return scoreBucketsDistribution;
-    }
-
-    public TimeDistribution getPredictedTime() {
-        return predictedTime;
     }
 
     public double getScoreTimeRate(long remainingTime, int currentScore) {
