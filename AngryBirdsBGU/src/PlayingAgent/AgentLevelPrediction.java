@@ -17,9 +17,9 @@ public class AgentLevelPrediction implements ScoreTimeRateCalculator {
 
     public double getScoreTimeRate(long remainingTime, int currentScore) {
         double probabilityAboveCurrScore = getProbabilityAboveScore(currentScore);
-        double expectationAboveScore = getExpectationAboveScore(currentScore, probabilityAboveCurrScore);
+        double expectationAboveCurrentScore = getExpectationAboveScore(currentScore, probabilityAboveCurrScore);
         double probabilityBelowRemainingTime = this.predictedTime.getProbabilityBelowValue(remainingTime);
-        double scoreTimeRate = ((expectationAboveScore - currentScore) * probabilityAboveCurrScore * probabilityBelowRemainingTime)
+        double scoreTimeRate = ((expectationAboveCurrentScore - currentScore) * probabilityAboveCurrScore * probabilityBelowRemainingTime)
                 / this.predictedTime.getExpectationBelowValue(remainingTime);
         return scoreTimeRate;
     }

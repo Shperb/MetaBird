@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +47,7 @@ public abstract class MetaAgent {
 	
 	abstract protected ArrayList<String> getLevelsList();
 
-	protected void actAfterLevelFinished(String plevelName, int score) {
+	protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
 	}
 
 	public MetaAgent(int pTimeConstraint, String[] pAgents) {
@@ -228,7 +227,7 @@ public abstract class MetaAgent {
 			}
 			getLevel().setEndTime();
 			DBHandler.saveData(mData);
-			actAfterLevelFinished(this.mCurrentLevel, score);
+			actAfterLevelFinished(this.mCurrentLevel, this.mWorkingAgent.getName(), score);
 			System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
 					+ getTimeConstraint());
 			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "

@@ -13,9 +13,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 public class PlayingAgent extends MetaAgent {
-    private final int NUM_LEVELS = 8;
+    private final int NUM_LEVELS = 21;
+    private final int NUM_LEVELS_TO_EXTRACT = 8;
+
     private HashMap<Integer, LevelPrediction> levelPredictions = new HashMap<>();
     private int currLevel = 1;
+    private int levelsPlayedSinceFeatureExtraction = 0;
+    private int numOfNewLevelsExtracted;
 
     private FeatureExctractor featureExtractor;
 
@@ -70,17 +74,34 @@ public class PlayingAgent extends MetaAgent {
             this.featureExtractor = new FeatureExctractor(this, super.mProxy);
         }
 
+        extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT);
+        caculateAgentsLevelDistributions();
+    }
+
+    private void caculateAgentsLevelDistributions() {
+        ArrayList<String> agentNames = getAgentsNames();
+        this.levelPredictions.forEach(
+                (levelNum, levelPrediction) ->
+                        levelPrediction.calculateAgentsDistributions(agentNames));
+    }
+
+    private void extractFeaturesForNextLevels(int numLevelsToExtract) {
         Features features;
+        this.numOfNewLevelsExtracted = 0;
         int firstLevelForFeatureExtraction = currLevel;
-        for (; currLevel < firstLevelForFeatureExtraction + NUM_LEVELS; currLevel++) {
+        for (; currLevel < firstLevelForFeatureExtraction + numLevelsToExtract; currLevel++) {
+            if(currLevel > NUM_LEVELS){
+                return;
+            }
             String pLevelName = String.valueOf(currLevel);
             super.mLevels.put(pLevelName, currLevel);
-            this.loadLevelForFeatureExtraction(currLevel);
             try{
+                this.loadLevelForFeatureExtraction(currLevel);
                 features = this.featureExtractor.growTreeAndReturnFeatures();
+                this.numOfNewLevelsExtracted++;
             }
             catch (Exception e){
-                System.out.println("*****************************************************************************");
+                System.out.println("******************************************************************************");
                 System.out.println("Failed to extract features for level " + pLevelName);
                 System.out.println("Saving features as null and this level will get the lowest score time rate");
                 System.out.println("******************************************************************************");
@@ -88,18 +109,20 @@ public class PlayingAgent extends MetaAgent {
             }
             this.levelPredictions.put(currLevel, new LevelPrediction(pLevelName, features));
         }
-
-        ArrayList<String> agentNames = getAgentsNames();
-        this.levelPredictions.forEach(
-                (levelNum, levelPrediction) ->
-                        levelPrediction.calculateAgentsDistributions(agentNames));
-
     }
 
     @Override
-    protected void actAfterLevelFinished(String plevelName, int score) {
+    protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
         int level = Integer.valueOf(plevelName);
         this.levelPredictions.get(level).updateScore(score);
+
+        // Extract features for more levels if needed
+        this.levelsPlayedSinceFeatureExtraction++;
+        if(this.levelsPlayedSinceFeatureExtraction > numOfNewLevelsExtracted){
+            this.levelsPlayedSinceFeatureExtraction = 0;
+            extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT / 2);
+            caculateAgentsLevelDistributions();
+        }
     }
 
     private void loadLevelForFeatureExtraction(int i) throws IOException, ClientConnectionException {

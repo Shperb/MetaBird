@@ -4,7 +4,6 @@ import sys
 from keras.models import load_model
 import numpy
 
-
 def load(filename):
         return load_model("models/" + filename)
 

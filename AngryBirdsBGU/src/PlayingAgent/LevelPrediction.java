@@ -26,19 +26,20 @@ public class LevelPrediction {
     }
 
     public void calculateAgentsDistributions(ArrayList<String> agents) {
-        this.agents = agents;
-        if(features != null) {
-            long maxScore = features.getMaxScore();
-            agents.forEach(agent -> {
-                double[] scoreBucketDistribution = ScorePredictionModel.getInstance().predict(agent, features);
-                TimeDistribution timeDistribution = TimePredictionModel.getInstance().predict(agent, features);
-                this.agentsPrediction.put(agent, new AgentLevelPrediction(maxScore, scoreBucketDistribution, timeDistribution));
-            });
-        }
-        else{
-            agents.forEach(agent -> {
-                this.agentsPrediction.put(agent, new EmptyAgentLevelPrediction());
-            });
+        if(this.agentsPrediction.isEmpty()) {
+            this.agents = agents;
+            if (features != null) {
+                long maxScore = features.getMaxScore();
+                agents.forEach(agent -> {
+                    double[] scoreBucketDistribution = ScorePredictionModel.getInstance().predict(agent, features);
+                    TimeDistribution timeDistribution = TimePredictionModel.getInstance().predict(agent, features);
+                    this.agentsPrediction.put(agent, new AgentLevelPrediction(maxScore, scoreBucketDistribution, timeDistribution));
+                });
+            } else {
+                agents.forEach(agent -> {
+                    this.agentsPrediction.put(agent, new EmptyAgentLevelPrediction());
+                });
+            }
         }
     }
 
