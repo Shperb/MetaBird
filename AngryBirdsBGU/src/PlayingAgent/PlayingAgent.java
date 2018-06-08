@@ -42,7 +42,7 @@ public class PlayingAgent extends MetaAgent {
         return this.levelPredictions.keySet().stream()
                 .map(level -> levelPredictions.get(level).getLevelBestAgent(finalTimeLeft))
                 .max(comparator)
-                .map(l -> new String[] {l.getAgent(), l.getLevel()})
+                .map(l -> new String[]{l.getAgent(), l.getLevel()})
                 .get();
     }
 
@@ -92,17 +92,16 @@ public class PlayingAgent extends MetaAgent {
         this.numOfNewLevelsExtracted = 0;
         int firstLevelForFeatureExtraction = currLevel;
         for (; currLevel < firstLevelForFeatureExtraction + numLevelsToExtract; currLevel++) {
-            if(currLevel > NUM_LEVELS){
+            if (currLevel > NUM_LEVELS) {
                 return;
             }
             String pLevelName = String.valueOf(currLevel);
             super.mLevels.put(pLevelName, currLevel);
-            try{
+            try {
                 this.loadLevelForFeatureExtraction(currLevel);
                 features = this.featureExtractor.growTreeAndReturnFeatures();
                 this.numOfNewLevelsExtracted++;
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("******************************************************************************");
                 System.out.println("Failed to extract features for level " + pLevelName);
                 System.out.println("Saving features as null and this level will get the lowest score time rate");
@@ -119,8 +118,11 @@ public class PlayingAgent extends MetaAgent {
         this.levelPredictions.get(level).updateScore(score, agentName);
 
         // Extract features for more levels if needed
+        if (currLevel > NUM_LEVELS) {
+            return;
+        }
         this.levelsPlayedSinceFeatureExtraction++;
-        if(this.levelsPlayedSinceFeatureExtraction >= numOfNewLevelsExtracted){
+        if (this.levelsPlayedSinceFeatureExtraction >= numOfNewLevelsExtracted) {
             this.levelsPlayedSinceFeatureExtraction = 0;
             extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT / 2);
             caculateAgentsLevelDistributions();
