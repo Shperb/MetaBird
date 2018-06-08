@@ -3,7 +3,7 @@ package PlayingAgent;
 import DB.Features;
 
 public class ScorePredictionModel {
-    private static final String pythonLoaderPath = "python/"
+    private static final String pythonLoaderPath = "python/loader.py";
     private static ScorePredictionModel instance;
     static{
         try{
