@@ -1,6 +1,7 @@
 package PlayingAgent;
 
 import DB.Features;
+import Utils.JsonUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
@@ -39,12 +40,7 @@ public class TimePredictionModel {
 
     private void initFromConfiguration() throws IOException {
         String jsonString = readConfiguration();
-
-        JsonReader jsonReader = new JsonReader(new StringReader(jsonString));
-        jsonReader.setLenient(true);
-        JsonParser parser = new JsonParser();
-
-        this.agentsStats = parser.parse(jsonReader).getAsJsonObject();
+        this.agentsStats = JsonUtils.parse(jsonString);
     }
 
     private double getMean(String agent) {
