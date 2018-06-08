@@ -2,6 +2,7 @@ package PlayingAgent;
 
 import DB.Features;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,13 +39,19 @@ public class LevelPrediction {
 
     public AgentScoreTimeRate getLevelBestAgent(long remainingTime) {
         Comparator<AgentScoreTimeRate> comparator = new AgentScoreTimeRate.AgentScoreTimeRateComparator();
+        System.out.println();
         return features != null ?
                 this.agentsPrediction.keySet().stream().map(agent ->
-                new AgentScoreTimeRate(
-                        level,
-                        agent,
-                        this.agentsPrediction.get(agent).getScoreTimeRate(remainingTime, this.currentScore)))
-                .max(comparator).get()
+                {
+                    double scoreTimeRate = this.agentsPrediction.get(agent).getScoreTimeRate(remainingTime, this.currentScore);
+                    System.out.println("Score time rate for level " + this.level + " for agent " + agent + " above " +
+                            currentScore + " score with " + remainingTime + " remaining time is: " + scoreTimeRate);
+                    return new AgentScoreTimeRate(
+                            level,
+                            agent,
+                            scoreTimeRate);
+                })
+                        .max(comparator).get()
                 : new AgentScoreTimeRate(level, agents.get(0), 0);
     }
 

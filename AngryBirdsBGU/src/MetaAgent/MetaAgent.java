@@ -382,12 +382,6 @@ public abstract class MetaAgent {
 				mCurrentLevel = pLevelName;
 				MyLogger.log("loaded level " + level);
 				System.out.println("loaded level " + level);
-				try {
-					extractFeatures(pLevelName);
-				}
-				catch (Exception e){
-					MyLogger.log(e);
-				}
 			} else {
 				MyLogger.log("failed to load level " + level);
 				System.err.println("failed to load level " + level);

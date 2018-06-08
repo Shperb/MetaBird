@@ -28,8 +28,7 @@ public class AgentLevelPrediction {
         double expectationAboveScore = getExpectationAboveScore(currentScore, probabilityAboveCurrScore);
         double probabilityBelowRemainingTime = this.predictedTime.getProbabilityBelowValue(remainingTime);
         double scoreTimeRate = ((expectationAboveScore - currentScore) * probabilityAboveCurrScore * probabilityBelowRemainingTime)
-                / TimeDistribution.getExpectationBelowValue(remainingTime);
-        System.out.println("Score time rate above " + currentScore + " score with" + remainingTime + "remaining time is: " + scoreTimeRate);
+                / this.predictedTime.getExpectationBelowValue(remainingTime);
         return scoreTimeRate;
     }
 

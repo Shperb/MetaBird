@@ -3,9 +3,18 @@ package PlayingAgent;
 import DB.Features;
 
 public class ScorePredictionModel {
+    private static final String pythonLoaderPath = "python/"
     private static ScorePredictionModel instance;
+    static{
+        try{
+            instance = new ScorePredictionModel();
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
     private ScorePredictionModel(){
-        // TODO: import the keras model to private member
+
     }
 
     public static ScorePredictionModel getInstance(){

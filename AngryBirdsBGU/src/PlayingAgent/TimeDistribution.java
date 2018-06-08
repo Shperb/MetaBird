@@ -1,12 +1,24 @@
 package PlayingAgent;
-public class TimeDistribution {
 
-    public double getProbabilityBelowValue(long millisec){
-        // TODO: Implement By Picking model, for instance Gaussian
-        return 0.5;
+import Utils.TruncatedNormal;
+import org.apache.commons.math3.distribution.NormalDistribution;
+
+public class TimeDistribution {
+    private final NormalDistribution normalDistribution;
+    private final double sd;
+    private final double mu;
+
+    public TimeDistribution(double mu, double sd) {
+        this.mu = mu;
+        this.sd = sd;
+        this.normalDistribution = new NormalDistribution(mu, sd);
     }
 
-    public static double getExpectationBelowValue(long remainingTime) {
-        return 30;
+    public double getProbabilityBelowValue(long timeLeft){
+        return this.normalDistribution.cumulativeProbability(timeLeft);
+    }
+
+    public double getExpectationBelowValue(long remainingTime) {
+        return new TruncatedNormal(this.mu, this.sd, 0, remainingTime).getNumericalMean();
     }
 }
