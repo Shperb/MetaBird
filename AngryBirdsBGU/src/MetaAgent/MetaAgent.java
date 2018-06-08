@@ -90,6 +90,7 @@ public abstract class MetaAgent {
 		if (shouldExit()) {
 			throw new Exception("Exiting");
 		}
+		// TODO: Don't start a new game when getTimeElapsed for playing Agent
 		if (getGame().getTimeElapsed() > getTimeConstraint() || shouldStartNewGame()) {
 			startNewGame();
 		} else {

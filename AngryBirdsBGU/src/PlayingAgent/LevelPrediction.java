@@ -61,7 +61,8 @@ public class LevelPrediction {
                 : new AgentScoreTimeRate(level, agents.get(0), 0);
     }
 
-    public void updateScore(int score) {
+    public void updateScore(int score, String agentName) {
+        // TODO: It is possible, if the agent did not improve the score, to "punish" his score/time rate fot this level
         this.currentScore = Math.max(currentScore, score);
     }
 

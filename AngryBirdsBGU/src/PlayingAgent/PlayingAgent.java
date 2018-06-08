@@ -116,11 +116,11 @@ public class PlayingAgent extends MetaAgent {
     @Override
     protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
         int level = Integer.valueOf(plevelName);
-        this.levelPredictions.get(level).updateScore(score);
+        this.levelPredictions.get(level).updateScore(score, agentName);
 
         // Extract features for more levels if needed
         this.levelsPlayedSinceFeatureExtraction++;
-        if(this.levelsPlayedSinceFeatureExtraction > numOfNewLevelsExtracted){
+        if(this.levelsPlayedSinceFeatureExtraction >= numOfNewLevelsExtracted){
             this.levelsPlayedSinceFeatureExtraction = 0;
             extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT / 2);
             caculateAgentsLevelDistributions();
