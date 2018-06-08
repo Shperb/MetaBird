@@ -6,6 +6,7 @@ import ab.vision.GameStateExtractor;
 import external.ClientMessageTable;
 import featureExtractor.demo.FeatureExctractor;
 
+import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -86,6 +87,7 @@ public class PlayingAgent extends MetaAgent {
     }
 
     private void extractFeaturesForNextLevels(int numLevelsToExtract) {
+        System.out.println(String.format("Trying to extract features for %d more levels", numLevelsToExtract));
         Features features;
         this.numOfNewLevelsExtracted = 0;
         int firstLevelForFeatureExtraction = currLevel;
