@@ -47,6 +47,10 @@ public abstract class MetaAgent {
 	
 	abstract protected ArrayList<String> getLevelsList();
 
+	protected GameResult getGameResult() {
+		return new GameResult(0, new HashMap<>());
+	}
+
 	protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
 	}
 
@@ -74,12 +78,12 @@ public abstract class MetaAgent {
 
 		System.out.println(message);
 		MyLogger.log(message);
-		
+
 //		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
 		byte[] configureResult = configure(Utils.intToByteArray(1000));
 		mProxy.setConfigureResult(configureResult);
 		getMyScore();// getMyScore waits for "start" button to be clicked on the server window
-		
+
 		mLevels.clear();
 		levelsList.forEach(l->{
 			mLevels.put(l, mLevels.size() + 1);
@@ -88,7 +92,7 @@ public abstract class MetaAgent {
 
 	private void chooseAgentAndLevel() throws Exception {
 		if (shouldExit()) {
-			throw new Exception("Exiting");
+			throw new EndGameException(getGameResult());
 		}
 		// TODO: Don't start a new game when getTimeElapsed for playing Agent
 		if (getGame().getTimeElapsed() > getTimeConstraint() || shouldStartNewGame()) {

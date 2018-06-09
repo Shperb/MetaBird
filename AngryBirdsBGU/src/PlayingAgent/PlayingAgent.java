@@ -6,7 +6,6 @@ import ab.vision.GameStateExtractor;
 import external.ClientMessageTable;
 import featureExtractor.demo.FeatureExctractor;
 
-import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -27,6 +26,18 @@ public class PlayingAgent extends MetaAgent {
     @Override
     protected String getAlgorithmName() {
         return null;
+    }
+
+    @Override
+    protected GameResult getGameResult(){
+        long totalScore = this.levelPredictions.values().stream().mapToLong(lp -> lp.getCurrentScore()).sum();
+        System.out.println("*******************************************************");
+        System.out.println("Total score is: " + totalScore);
+        System.out.println("*******************************************************");
+
+        HashMap<Integer, Integer> levelScores = new HashMap<>();
+        this.levelPredictions.forEach((l, pred) -> levelScores.put(l, pred.getCurrentScore()));
+        return new GameResult(totalScore, levelScores);
     }
 
     @Override
@@ -53,7 +64,11 @@ public class PlayingAgent extends MetaAgent {
 
     @Override
     protected boolean shouldExit() {
-        return false;
+        try {
+            return getGame().getTimeElapsed() > getTimeConstraint();
+        } catch (ParseException e) {
+            return true;
+        }
     }
 
     @Override
@@ -66,7 +81,7 @@ public class PlayingAgent extends MetaAgent {
     }
 
     @Override
-    protected void selectLevels() throws Exception {
+    protected void selectLevels() {
         byte[] configureResult = configure(Utils.intToByteArray(1000));
         mProxy.setConfigureResult(configureResult);
         getMyScore();// getMyScore waits for "start" button to be clicked on the server window

@@ -12,9 +12,10 @@ public class LevelPrediction {
 
     private Features features;
     private HashMap<String, ScoreTimeRateCalculator> agentsPrediction;
-    private int currentScore = 0;
-    private ArrayList<String> agents;
 
+    private int currentScore = 0;
+
+    private ArrayList<String> agents;
     public Features getFeatures() {
         return features;
     }
@@ -68,5 +69,9 @@ public class LevelPrediction {
 
     public String getLevel() {
         return level;
+    }
+
+    public int getCurrentScore() {
+        return currentScore;
     }
 }
