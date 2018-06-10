@@ -21,8 +21,8 @@ public class Main {
             }
             catch(EndGameException ex) {
                 System.out.println("*********************************************************************");
-                System.out.println("Total Score of " + pAgents[0] + " is: " + results[i].getTotalScore());
-                results[i].getLevelScores().forEach(
+                System.out.println("Total Score of " + pAgents[0] + " is: " + ex.getGameResult().getTotalScore());
+                ex.getGameResult().getLevelScores().forEach(
                         (l, score) ->
                                 System.out.println(String.format("Score for level %d is: %d", l, score))
                 );
