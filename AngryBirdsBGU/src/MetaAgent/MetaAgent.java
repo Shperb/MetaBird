@@ -36,6 +36,7 @@ public abstract class MetaAgent {
 	private int mTimeConstraint;
 	ServerSocket mServerSocket;
 	private FeatureExctractor featureExtractor;
+	private HashMap<String, Integer> levelScores = new HashMap<>();
 
 	abstract protected String getAlgorithmName();
 
@@ -48,10 +49,15 @@ public abstract class MetaAgent {
 	abstract protected ArrayList<String> getLevelsList();
 
 	protected GameResult getGameResult() {
-		return new GameResult(0, new HashMap<>());
+		long totalScore = this.levelScores.values().stream().mapToInt(i -> i).sum();
+		return new GameResult(totalScore, new HashMap<>());
 	}
 
 	protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
+		int currScore = this.levelScores.getOrDefault(plevelName, 0);
+		if(score > currScore){
+			this.levelScores.put(plevelName, score);
+		}
 	}
 
 	public MetaAgent(int pTimeConstraint, String[] pAgents) {
@@ -92,6 +98,7 @@ public abstract class MetaAgent {
 
 	private void chooseAgentAndLevel() throws Exception {
 		if (shouldExit()) {
+			mServerSocket.close();
 			throw new EndGameException(getGameResult());
 		}
 		// TODO: Don't start a new game when getTimeElapsed for playing Agent
