@@ -32,6 +32,7 @@ public class Features {
     public long stonedTerritory;
     public long averagePigsInBlocks;
     public long blocksWithPigs;
+    public long tnts;
 
     public long getMaxScore() {
         return (numBirds - 1) * 10000 + numPigs * 5300 + (stoneObjects + woodObjects + iceObjects) * 1250;
@@ -68,6 +69,7 @@ public class Features {
         lst.add((double) varietyOfBirds);
         lst.add((double) stoneObjects);
         lst.add((double) targetWidth);
+        lst.add((double) tnts);
 
         return lst;
     }

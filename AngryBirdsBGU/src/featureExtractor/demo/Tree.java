@@ -415,6 +415,7 @@ public class Tree
         features.stonedTerritory = getStonedTerritory();
         features.averagePigsInBlocks = getBlockedPigs(); //must run after getNumOfBlocks
         features.blocksWithPigs = getBlocksWithPigs();
+        features.tnts = getNumOfTnts();
 
         return features;
     }

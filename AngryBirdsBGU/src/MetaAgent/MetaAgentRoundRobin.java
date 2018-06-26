@@ -11,7 +11,7 @@ public class MetaAgentRoundRobin extends MetaAgent {
 	ArrayList<Agent> mAgentWhoTriedCurrentLevel = new ArrayList<>();
 
 	public MetaAgentRoundRobin(int pTimeConstraint, String[] pAgents) {
-		super(pTimeConstraint, pAgents);
+		super(pTimeConstraint, pAgents, true);
 	}
 
 	@Override

@@ -44,6 +44,6 @@ public class RoundRobinAgent extends MetaAgent {
     }
 
     public RoundRobinAgent(int pTimeConstraint, String[] pAgents) {
-        super(pTimeConstraint, pAgents);
+        super(pTimeConstraint, pAgents, false);
     }
 }

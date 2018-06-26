@@ -21,7 +21,7 @@ public class MyConnectionToClient extends MyConnection {
 		}
 		System.out.println("Waiting for a client " + pExecutableFileName + " ...");
 		Socket socket = pServerSocket.accept();
-		socket.setSoTimeout(20000);
+		socket.setSoTimeout(60000);
 		System.out.println("Client accepted");
 		mInputStream = socket.getInputStream();
 		mOutputStream = socket.getOutputStream();

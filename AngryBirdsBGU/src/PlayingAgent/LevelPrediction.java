@@ -4,6 +4,7 @@ import DB.Features;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 
@@ -33,6 +34,7 @@ public class LevelPrediction {
                 long maxScore = features.getMaxScore();
                 agents.forEach(agent -> {
                     double[] scoreBucketDistribution = ScorePredictionModel.getInstance().predict(agent, features);
+                    System.out.println(String.format("Score distribution for agent %s for level %s is " + Arrays.toString(scoreBucketDistribution), agent, this.level));
                     TimeDistribution timeDistribution = TimePredictionModel.getInstance().predict(agent, features);
                     this.agentsPrediction.put(agent, new AgentLevelPrediction(maxScore, scoreBucketDistribution, timeDistribution));
                 });
