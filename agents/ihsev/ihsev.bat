@@ -1,1 +1,1 @@
-java -jar ihsev.jar
+java -Xmx1500m -jar ihsev.jar
