@@ -11,8 +11,8 @@ public class Main {
 		try {
 
 			
-			new MetaAgentDistributionSampling(600, new String[] {"planA"
-//					, "naive", "AngryBER", "ihsev"
+			new ExtensionLevelsDistributionAgent(6000, new String[] {"planA"
+					, "naive", "AngryBER", "ihsev"
 			}).start();
 			
 //			new AlgorithmTesterDynamicProgramming(600).test(100);
