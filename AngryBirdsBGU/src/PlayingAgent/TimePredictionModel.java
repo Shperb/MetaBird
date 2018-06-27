@@ -33,9 +33,9 @@ public class TimePredictionModel {
         return instance;
     }
 
-    public TimeDistribution predict(String agent, Features levelFeatures) {
+    public LearnedTimeDistribution predict(String agent, Features levelFeatures) {
         int numBirds = (int) levelFeatures.numBirds;
-        return new TimeDistribution(numBirds * getMean(agent), numBirds * getStd(agent));
+        return new LearnedTimeDistribution(numBirds * getMean(agent), numBirds * getStd(agent));
     }
 
     private void initFromConfiguration() throws IOException {

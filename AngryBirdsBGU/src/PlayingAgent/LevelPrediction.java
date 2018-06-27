@@ -1,21 +1,22 @@
 package PlayingAgent;
 
 import DB.Features;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 
-public class LevelPrediction {
-    private String level;
+import com.google.gson.JsonSyntaxException;
 
-    private Features features;
-    private HashMap<String, ScoreTimeRateCalculator> agentsPrediction;
+public abstract class LevelPrediction {
+    protected String level;
+
+    protected Features features;
+    protected HashMap<String, ScoreTimeRateCalculator> agentsPrediction;
 
     private int currentScore = 0;
 
-    private ArrayList<String> agents;
+    protected ArrayList<String> agents;
     public Features getFeatures() {
         return features;
     }
@@ -26,23 +27,8 @@ public class LevelPrediction {
         this.level = level;
     }
 
-    public void calculateAgentsDistributions(ArrayList<String> agents) {
-        if(this.agentsPrediction.isEmpty()) {
-            this.agents = agents;
-            if (features != null) {
-                long maxScore = features.getMaxScore();
-                agents.forEach(agent -> {
-                    double[] scoreBucketDistribution = ScorePredictionModel.getInstance().predict(agent, features);
-                    TimeDistribution timeDistribution = TimePredictionModel.getInstance().predict(agent, features);
-                    this.agentsPrediction.put(agent, new AgentLevelPrediction(maxScore, scoreBucketDistribution, timeDistribution));
-                });
-            } else {
-                agents.forEach(agent -> {
-                    this.agentsPrediction.put(agent, new EmptyAgentLevelPrediction());
-                });
-            }
-        }
-    }
+    public abstract void calculateAgentsDistributions(ArrayList<String> agents) throws JsonSyntaxException, IOException;
+    
 
     public AgentScoreTimeRate getLevelBestAgent(long remainingTime) {
         Comparator<AgentScoreTimeRate> comparator = new AgentScoreTimeRate.AgentScoreTimeRateComparator();
@@ -65,6 +51,7 @@ public class LevelPrediction {
     public void updateScore(int score, String agentName) {
         // TODO: It is possible, if the agent did not improve the score, to "punish" his score/time rate fot this level
         this.currentScore = Math.max(currentScore, score);
+        agentsPrediction.get(agentName).updateProbability(score);
     }
 
     public String getLevel() {

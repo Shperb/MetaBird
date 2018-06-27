@@ -6,4 +6,8 @@ public class EmptyAgentLevelPrediction implements ScoreTimeRateCalculator {
     public double getScoreTimeRate(long remainingTime, int currentScore) {
         return 0;
     }
+
+	@Override
+	public void updateProbability(int score) {		
+	}
 }

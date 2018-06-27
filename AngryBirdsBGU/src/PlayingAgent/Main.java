@@ -1,7 +1,7 @@
 package PlayingAgent;
 
-import MetaAgent.EndGameException;
-import MetaAgent.GameResult;
+import MetaAgent.*;
+
 
 public class Main {
     public static void main(String[] args) throws Exception {

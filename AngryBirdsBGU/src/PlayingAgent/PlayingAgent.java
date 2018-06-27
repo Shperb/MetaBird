@@ -1,5 +1,6 @@
 package PlayingAgent;
 
+import Clock.Clock;
 import DB.Features;
 import MetaAgent.*;
 import ab.vision.GameStateExtractor;
@@ -10,14 +11,17 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+
+import com.google.gson.JsonSyntaxException;
 
 public class PlayingAgent extends MetaAgent {
     private final int NUM_LEVELS = 21;
-    private final int NUM_LEVELS_TO_EXTRACT = 8;
+    private int numLevelstoExtract;
 
-    private HashMap<Integer, LevelPrediction> levelPredictions = new HashMap<>();
-    private int currLevel = 1;
+    protected HashMap<Integer, LevelPrediction> levelPredictions = new HashMap<>();
+    protected int currLevel = 1;
     private int levelsPlayedSinceFeatureExtraction = 0;
     private int numOfNewLevelsExtracted;
 
@@ -81,24 +85,28 @@ public class PlayingAgent extends MetaAgent {
     }
 
     @Override
-    protected void selectLevels() {
+    protected Date selectLevels() throws JsonSyntaxException, IOException {
         byte[] configureResult = configure(Utils.intToByteArray(1000));
         mProxy.setConfigureResult(configureResult);
+        numLevelstoExtract = configureResult[2];
+        mTimeConstraint = configureResult[1]*60;
         getMyScore();// getMyScore waits for "start" button to be clicked on the server window
-
+        Date startTime = Clock.getClock().getDate();
+        
         if (this.featureExtractor == null) {
             this.featureExtractor = new FeatureExctractor(this, super.mProxy);
         }
 
-        extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT);
+        extractFeaturesForNextLevels(numLevelstoExtract);
         caculateAgentsLevelDistributions();
+        return startTime;
     }
 
-    private void caculateAgentsLevelDistributions() {
+    private void caculateAgentsLevelDistributions() throws JsonSyntaxException, IOException {
         ArrayList<String> agentNames = getAgentsNames();
-        this.levelPredictions.forEach(
-                (levelNum, levelPrediction) ->
-                        levelPrediction.calculateAgentsDistributions(agentNames));
+        for (LevelPrediction levelPrediction : levelPredictions.values()){
+        	levelPrediction.calculateAgentsDistributions(agentNames);
+        }                      
     }
 
     private void extractFeaturesForNextLevels(int numLevelsToExtract) {
@@ -123,12 +131,16 @@ public class PlayingAgent extends MetaAgent {
                 System.out.println("******************************************************************************");
                 features = null;
             }
-            this.levelPredictions.put(currLevel, new LevelPrediction(pLevelName, features));
+            CreateLevelPrediction(features, pLevelName);
         }
     }
 
+	protected void CreateLevelPrediction(Features features, String pLevelName) {
+		this.levelPredictions.put(currLevel, new LearnedLevelPrediction(pLevelName, features));
+	}
+
     @Override
-    protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
+    protected void actAfterLevelFinished(String plevelName, String agentName, int score) throws JsonSyntaxException, IOException {
         int level = Integer.valueOf(plevelName);
         this.levelPredictions.get(level).updateScore(score, agentName);
 
@@ -139,7 +151,7 @@ public class PlayingAgent extends MetaAgent {
         this.levelsPlayedSinceFeatureExtraction++;
         if (this.levelsPlayedSinceFeatureExtraction >= numOfNewLevelsExtracted) {
             this.levelsPlayedSinceFeatureExtraction = 0;
-            extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT / 2);
+            extractFeaturesForNextLevels(numLevelstoExtract / 2);
             caculateAgentsLevelDistributions();
         }
     }

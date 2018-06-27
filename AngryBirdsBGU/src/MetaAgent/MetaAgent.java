@@ -12,9 +12,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.google.gson.JsonSyntaxException;
+
 import Clock.Clock;
 import Clock.SystemClock;
 import DB.*;
+import Distribution.ImplicitDistribution;
 import ab.vision.GameStateExtractor;
 import ab.vision.GameStateExtractor.GameState;
 import external.ClientMessageEncoder;
@@ -33,7 +36,7 @@ public abstract class MetaAgent {
 
 	protected Proxy mProxy;
 	private ArrayList<Agent> mAgents = new ArrayList<>();
-	private int mTimeConstraint;
+	protected int mTimeConstraint;
 	ServerSocket mServerSocket;
 	private FeatureExctractor featureExtractor;
 	private HashMap<String, Integer> levelScores = new HashMap<>();
@@ -53,7 +56,7 @@ public abstract class MetaAgent {
 		return new GameResult(totalScore, new HashMap<>());
 	}
 
-	protected void actAfterLevelFinished(String plevelName, String agentName, int score) {
+	protected void actAfterLevelFinished(String plevelName, String agentName, int score) throws JsonSyntaxException, IOException {
 		int currScore = this.levelScores.getOrDefault(plevelName, 0);
 		if(score > currScore){
 			this.levelScores.put(plevelName, score);
@@ -71,7 +74,7 @@ public abstract class MetaAgent {
 		mTimeConstraint = pTimeConstraint;
 	}
 
-	protected void selectLevels() throws Exception {
+	protected Date selectLevels() throws Exception {
 		ArrayList<String> levelsList = getLevelsList();
 		while(levelsList.isEmpty()){
 			levelsList = getLevelsList();
@@ -89,11 +92,13 @@ public abstract class MetaAgent {
 		byte[] configureResult = configure(Utils.intToByteArray(1000));
 		mProxy.setConfigureResult(configureResult);
 		getMyScore();// getMyScore waits for "start" button to be clicked on the server window
-
+		Date startTime = Clock.getClock().getDate();
+		
 		mLevels.clear();
 		levelsList.forEach(l->{
 			mLevels.put(l, mLevels.size() + 1);
 		});
+		return startTime;
 	}
 
 	private void chooseAgentAndLevel() throws Exception {
@@ -147,13 +152,13 @@ public abstract class MetaAgent {
 	private void startNewGame() throws Exception {
 		MyLogger.log("starting new game");
 		// mLastGameState = GameState.MAIN_MENU;
-		selectLevels();
-		createNewGameEntry();
+		Date startTime = selectLevels();
+		createNewGameEntry(startTime);
 		chooseAgentAndLevel();
 	}
 
-	protected void createNewGameEntry() {
-		mData.games.add(new Game(getAlgorithmName(), mTimeConstraint));
+	protected void createNewGameEntry(Date startTime) {
+		mData.games.add(new Game(getAlgorithmName(), mTimeConstraint,startTime));
 		for (int i = 0; i < mAgents.size(); i++) {
 			getGame().agents.add(mAgents.get(i).getName());
 		}
@@ -267,7 +272,7 @@ public abstract class MetaAgent {
 
 	private boolean scoreNotChanging() {
 		int shotsCnt = 3;
-		Distribution distribution = new Distribution();
+		ImplicitDistribution distribution = new ImplicitDistribution();
 		boolean[] retVal = { false };
 		getLevel().shots.forEach(shot -> {
 			distribution.addTally(shot.score);
