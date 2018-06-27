@@ -1,9 +1,13 @@
 package PlayingAgent;
 
+import java.util.Map;
+
 public interface ScoreTimeRateCalculator {
     double getScoreTimeRate(long remainingTime, int currentScore);
 
-	void updateProbability(int score);
+	Map<String, Double> updateProbability(int score);
+
+    void setProbability(Map<String, Double> levelProfileProbabilities);
 }
 
 

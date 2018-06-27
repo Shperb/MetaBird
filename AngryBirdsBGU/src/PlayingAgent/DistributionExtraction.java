@@ -19,6 +19,7 @@ import DB.ValueExtractor.ValueExtractorTimeTaken;
 import Distribution.BinnedDistributionOfDistributions;
 import Distribution.Distribution;
 import Distribution.DistributionOfDistributions;
+import Distribution.NamedDistribution;
 import Distribution.ImplicitDistribution;
 import Distribution.LevelDistance;
 
@@ -272,10 +273,10 @@ public class DistributionExtraction {
 			HashMap<String, Distribution> agentNewDistributions = new HashMap<String, Distribution>();
 			for (String level: mLevels){
 				HashMap<String,Double> distance = computeDistanceFromEachLevel(level,k,currProb);
-				HashMap<Distribution,Double> distributionOfDistributions = new HashMap<Distribution, Double>();
+				HashMap<NamedDistribution,Double> distributionOfDistributions = new HashMap<NamedDistribution, Double>();
 				for (String lvl : distance.keySet()){
 					
-					distributionOfDistributions.put(agentDistribution.get(lvl), distance.get(lvl));
+					distributionOfDistributions.put(new NamedDistribution(lvl,agentDistribution.get(lvl)), distance.get(lvl));
 				}
 				double maxValue = isScore? mfeaturesData.computeMaxScoreBasedOnFeatures(level) : 300;
 				if (isBinned){

@@ -2,10 +2,7 @@ package PlayingAgent;
 
 import DB.Features;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -52,7 +49,12 @@ public abstract class LevelPrediction {
     public void updateScore(int score, String agentName) {
         // TODO: It is possible, if the agent did not improve the score, to "punish" his score/time rate fot this level
         this.currentScore = Math.max(currentScore, score);
-        agentsPrediction.get(agentName).updateProbability(score);
+        Map<String,Double> levelProfileProbabilities= agentsPrediction.get(agentName).updateProbability(score);
+        if (levelProfileProbabilities != null) {
+            for (ScoreTimeRateCalculator calc : agentsPrediction.values()) {
+                calc.setProbability(levelProfileProbabilities);
+            }
+        }
     }
 
     public String getLevel() {

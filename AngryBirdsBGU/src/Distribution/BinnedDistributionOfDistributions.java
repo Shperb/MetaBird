@@ -1,21 +1,15 @@
 package Distribution;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class BinnedDistributionOfDistributions extends Distribution{
-	private HashMap<Distribution, Double> mDistributionsProbabilities;
+	private HashMap<NamedDistribution, Double> mDistributionsProbabilities;
 	private double mMaxValue;
 	private List<Bin> mBins;
 	private final double epsilon =0.0001;
 	
-	public BinnedDistributionOfDistributions(HashMap<Distribution, Double> distributionsProbabilities,double maxScore){
+	public BinnedDistributionOfDistributions(HashMap<NamedDistribution, Double> distributionsProbabilities,double maxScore){
 		mDistributionsProbabilities = distributionsProbabilities;
 		mMaxValue = maxScore;
 		mBins= new ArrayList<Bin>();
@@ -32,7 +26,7 @@ public class BinnedDistributionOfDistributions extends Distribution{
 		//if (Math.abs(bin.getMid()*mMaxValue - pVal)> epsilon){
 		//	return 0;
 		//}
-		for (Entry<Distribution, Double> entry: mDistributionsProbabilities.entrySet()){
+		for (Entry<NamedDistribution, Double> entry: mDistributionsProbabilities.entrySet()){
 			double prob = computeBinProbablityInCDF(entry.getKey().getCDF(),bin,entry.getKey().getMaxValue());
 			retVal[0] += prob * entry.getValue();
 		}
@@ -140,7 +134,7 @@ public class BinnedDistributionOfDistributions extends Distribution{
 	
 	public SortedMap<Integer,Double> getCDF(){
 		SortedMap<Integer,Double> distribution = new TreeMap<Integer,Double>();
-		for (Entry<Distribution, Double> entry : mDistributionsProbabilities.entrySet()){
+		for (Entry<NamedDistribution, Double> entry : mDistributionsProbabilities.entrySet()){
 			for (Integer value : entry.getKey().getSupport()){
 				if (distribution.containsKey(value)){
 					distribution.put(value, distribution.get(value)+entry.getValue()*entry.getKey().getLikelihood(value));
@@ -159,16 +153,31 @@ public class BinnedDistributionOfDistributions extends Distribution{
 		return distribution;
 	}
 	
-	public void updateProbablity(int value){
-		
+	public Map<String, Double> updateProbablity(int value){
+		Map<String,Double> ret = new HashMap<String,Double>();
 		Bin bin = getBin(value/mMaxValue);
 		double mid = bin.getMid();
+        double normalizationFactor = 0;
 		double valueProbability = getLikelihood((int)(mid*mMaxValue));
-		for (Entry<Distribution, Double> entry : mDistributionsProbabilities.entrySet()){
+		for (Entry<NamedDistribution, Double> entry : mDistributionsProbabilities.entrySet()){
 			double prob = computeBinProbablityInCDF(entry.getKey().getCDF(),bin,entry.getKey().getMaxValue());
-			entry.setValue(prob * entry.getValue() / valueProbability);
+            double currentValue = prob * entry.getValue() / valueProbability;
+            normalizationFactor += currentValue;
+			entry.setValue(currentValue);
 		}
-		
-	}
+        for (Entry<NamedDistribution, Double> entry : mDistributionsProbabilities.entrySet()){
+            entry.setValue(entry.getValue()/normalizationFactor);
+            ret.put(entry.getKey().getLevelName(),entry.getValue());
+        }
+
+        return ret;
+    }
+
+    @Override
+    public void setProbability(Map<String, Double> levelProfileProbabilities) {
+        for (Entry<NamedDistribution,Double> entry : mDistributionsProbabilities.entrySet()){
+            entry.setValue(levelProfileProbabilities.get(entry.getKey().getLevelName()));
+        }
+    }
 
 }

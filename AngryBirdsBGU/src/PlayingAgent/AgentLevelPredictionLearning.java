@@ -2,6 +2,8 @@ package PlayingAgent;
 
 import Utils.DistributionHelper;
 
+import java.util.Map;
+
 public class AgentLevelPredictionLearning extends AgentLevelPrediction {
 
     private double[] scoreBucketsDistribution;
@@ -29,6 +31,11 @@ public class AgentLevelPredictionLearning extends AgentLevelPrediction {
 	}
 
 	@Override
-	public void updateProbability(int score) {		
+	public Map<String, Double> updateProbability(int score) {
+        return null;
 	}
+
+    @Override
+    public void setProbability(Map<String, Double> levelProfileProbabilities) {
+    }
 }

@@ -1,5 +1,7 @@
 package PlayingAgent;
 
+import java.util.Map;
+
 public class EmptyAgentLevelPrediction implements ScoreTimeRateCalculator {
 
     @Override
@@ -8,6 +10,11 @@ public class EmptyAgentLevelPrediction implements ScoreTimeRateCalculator {
     }
 
 	@Override
-	public void updateProbability(int score) {		
+	public Map<String, Double> updateProbability(int score) {
+        return null;
 	}
+
+    @Override
+    public void setProbability(Map<String, Double> levelProfileProbabilities) {
+    }
 }

@@ -128,8 +128,7 @@ public class ImplicitDistribution extends Distribution{
 	}
 
 	@Override
-	public void updateProbablity(int value) {
-		// TODO Auto-generated method stub
-		
+	public Map<String, Double> updateProbablity(int value) {
+		return null;
 	}
 }

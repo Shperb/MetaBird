@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import Clock.Clock;
 import DB.Game;
 
 public class MetaAgentDynamicProgramming extends MetaAgent {
@@ -56,7 +57,7 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 				getGame().setEndTime();
 				mSamplingDistribution = false;
 				generatePolicy();
-				createNewGameEntry();
+				createNewGameEntry(Clock.getClock().getDate());
 				return GetNewAgentAndLevel();
 			} else {
 				return retVal.get(0);

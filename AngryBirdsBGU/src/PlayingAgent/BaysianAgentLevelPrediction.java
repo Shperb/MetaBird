@@ -2,6 +2,8 @@ package PlayingAgent;
 
 import Distribution.Distribution;
 
+import java.util.Map;
+
 public class BaysianAgentLevelPrediction extends
 		AgentLevelPrediction {
 	
@@ -19,10 +21,14 @@ public class BaysianAgentLevelPrediction extends
 	}
 
 	@Override
-	public void updateProbability(int score) {
-		distribution.updateProbablity(score);
-		
+	public Map<String, Double> updateProbability(int score) {
+		return distribution.updateProbablity(score);
 	}
+
+    @Override
+    public void setProbability(Map<String, Double> levelProfileProbabilities) {
+        distribution.setProbability(levelProfileProbabilities);
+    }
 
 
 }

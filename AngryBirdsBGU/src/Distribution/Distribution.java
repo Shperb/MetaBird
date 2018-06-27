@@ -1,5 +1,6 @@
 package Distribution;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -16,7 +17,7 @@ public abstract class Distribution implements TimeDistribution{
 	public abstract String distributionType();
 	public abstract double getMaxValue();
 	public abstract SortedMap<Integer,Double> getCDF();
-	public abstract void updateProbablity(int value);
+	public abstract Map<String, Double> updateProbablity(int value);
 	
 	public double getExpectation() {
 		return getExpectation(0);
@@ -29,5 +30,6 @@ public abstract class Distribution implements TimeDistribution{
     public double getExpectationBelowValue(long remainingTime){
     	return getExpectationAndProbabilityBelowValue(remainingTime)[0];
     }
-    
+
+    public  void setProbability(Map<String, Double> levelProfileProbabilities){};
 }

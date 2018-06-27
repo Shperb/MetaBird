@@ -38,6 +38,8 @@ public class Features {
         return (numBirds - 1) * 10000 + numPigs * 5300 + (stoneObjects + woodObjects + iceObjects) * 1250;
     }
 
+
+
     public List<Double> getFeatureAsList() {
         ArrayList<Double> lst = new ArrayList<>();
 
@@ -72,5 +74,9 @@ public class Features {
         lst.add((double) tnts);
 
         return lst;
+    }
+
+    public static int amountOfFeatuers() {
+        return new Features().getFeatureAsList().size();
     }
 }

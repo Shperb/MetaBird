@@ -10,17 +10,17 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class DistributionOfDistributions extends Distribution{
-	private HashMap<Distribution, Double> mDistributionsProbabilities;
+	private HashMap<NamedDistribution, Double> mDistributionsProbabilities;
 	private double mMaxScore;
 	
-	public DistributionOfDistributions(HashMap<Distribution, Double> distributionsProbabilities,double maxScore){
+	public DistributionOfDistributions(HashMap<NamedDistribution, Double> distributionsProbabilities,double maxScore){
 		mDistributionsProbabilities = distributionsProbabilities;
 		mMaxScore = maxScore;
 	}
 	@Override
 	public double getLikelihood(Integer pVal) {
 		double[] retVal = {0};
-		for (Entry<Distribution, Double> entry: mDistributionsProbabilities.entrySet()){
+		for (Entry<NamedDistribution, Double> entry: mDistributionsProbabilities.entrySet()){
 			retVal[0] += entry.getKey().getLikelihood((int)(entry.getKey().getMaxValue()* pVal/getMaxValue())) * entry.getValue();
 		}
 		return retVal[0];
@@ -30,8 +30,8 @@ public class DistributionOfDistributions extends Distribution{
 	public double[] getExpectationAndProbabilityBelowValue(long value) {
 		double[] retVal = {0,0};
 		mDistributionsProbabilities.forEach((dist, prob)->{
-			retVal[0] += dist.getExpectationAndProbabilityBelowValue((int)(value/getMaxValue() * dist.getMaxValue()))[0] * prob;
-			retVal[1] += dist.getExpectationAndProbabilityBelowValue((int)(value/getMaxValue() * dist.getMaxValue()))[1] * prob;
+			retVal[0] += dist.getExpectationAndProbabilityBelowValue((int) (value / getMaxValue() * dist.getMaxValue()))[0] * prob;
+			retVal[1] += dist.getExpectationAndProbabilityBelowValue((int) (value / getMaxValue() * dist.getMaxValue()))[1] * prob;
 		});
 		return retVal;
 	}
@@ -39,7 +39,7 @@ public class DistributionOfDistributions extends Distribution{
 	@Override
 	public double getExpectation(long pSubstract) {
 		double[] retVal = {0};
-		for (Entry<Distribution, Double> entry: mDistributionsProbabilities.entrySet()){
+		for (Entry<NamedDistribution, Double> entry: mDistributionsProbabilities.entrySet()){
 			retVal[0] += entry.getKey().getExpectation(pSubstract)/entry.getKey().getMaxValue() * getMaxValue() * entry.getValue();
 		}
 		return retVal[0];
@@ -49,9 +49,9 @@ public class DistributionOfDistributions extends Distribution{
 	public int drawValue() throws Exception {
 		double random = Math.random();
 		double sum = 0;
-		Iterator<Entry<Distribution, Double>> iter = mDistributionsProbabilities.entrySet().iterator();
+		Iterator<Entry<NamedDistribution, Double>> iter = mDistributionsProbabilities.entrySet().iterator();
 		while (iter.hasNext()) {
-			Entry<Distribution, Double> entry = iter.next();
+			Entry<NamedDistribution, Double> entry = iter.next();
 			sum+= entry.getValue();
 			if (sum >= random){
 				return (int)(entry.getKey().drawValue()/entry.getKey().getMaxValue() * getMaxValue());
@@ -91,7 +91,7 @@ public class DistributionOfDistributions extends Distribution{
 	
 	public SortedMap<Integer,Double> getCDF(){
 		SortedMap<Integer,Double> distribution = new TreeMap<Integer,Double>();
-		for (Entry<Distribution, Double> entry : mDistributionsProbabilities.entrySet()){
+		for (Entry<NamedDistribution, Double> entry : mDistributionsProbabilities.entrySet()){
 			for (Integer value : entry.getKey().getSupport()){
 				if (distribution.containsKey(value)){
 					distribution.put(value, distribution.get(value)+entry.getValue()*entry.getKey().getLikelihood(value));
@@ -110,9 +110,8 @@ public class DistributionOfDistributions extends Distribution{
 		return distribution;
 	}
 	@Override
-	public void updateProbablity(int value) {
-		// TODO Auto-generated method stub
-		
+	public Map<String, Double> updateProbablity(int value) {
+		return null;
 	}
 
 }
