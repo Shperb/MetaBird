@@ -1,9 +1,7 @@
 package MetaAgent;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -11,7 +9,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 	private final int mSamplesPerPair = 12; //TODO - changeable
 
 	public MetaAgentDistributionSampling(int pTimeConstraint, String[] pAgents) {
-		super(pTimeConstraint, pAgents);
+		super(pTimeConstraint, pAgents, true);
 	}
 
 	@Override
@@ -101,7 +99,7 @@ public class MetaAgentDistributionSampling extends MetaAgent {
 		return Integer.MAX_VALUE;
 	}
 	
-	private boolean isRequired(String pLevel) {
+	protected boolean isRequired(String pLevel) {
 		boolean[] retVal = {false};
 		getAgentsNames().forEach(a->{
 			if (getCount(a, pLevel) < mSamplesPerPair) {

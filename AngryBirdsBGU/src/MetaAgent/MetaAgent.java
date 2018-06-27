@@ -4,13 +4,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -39,7 +35,9 @@ public abstract class MetaAgent {
 	protected int mTimeConstraint;
 	ServerSocket mServerSocket;
 	private FeatureExctractor featureExtractor;
-	private HashMap<String, Integer> levelScores = new HashMap<>();
+	protected HashMap<String, Integer> levelScores = new HashMap<>();
+	protected HashMap<String, String> levelsBestAgent = new HashMap<>();
+	private boolean training;
 
 	abstract protected String getAlgorithmName();
 
@@ -53,17 +51,19 @@ public abstract class MetaAgent {
 
 	protected GameResult getGameResult() {
 		long totalScore = this.levelScores.values().stream().mapToInt(i -> i).sum();
-		return new GameResult(totalScore, new HashMap<>());
+		return new GameResult(totalScore, this.levelScores, this.levelsBestAgent);
 	}
 
 	protected void actAfterLevelFinished(String plevelName, String agentName, int score) throws JsonSyntaxException, IOException {
 		int currScore = this.levelScores.getOrDefault(plevelName, 0);
 		if(score > currScore){
 			this.levelScores.put(plevelName, score);
+			this.levelsBestAgent.put(plevelName, agentName);
 		}
 	}
 
-	public MetaAgent(int pTimeConstraint, String[] pAgents) {
+	public MetaAgent(int pTimeConstraint, String[] pAgents, boolean training) {
+		this.training = training;
 		Clock.setClock(new SystemClock());
 
 		//TODO - changeable - for tests, can add only one of the agents instead of all
@@ -80,7 +80,7 @@ public abstract class MetaAgent {
 			levelsList = getLevelsList();
 		}
 		if (levelsList.size() > 8) {
-			throw new Exception("Can't choose more than 8 levels");
+//			throw new Exception("Can't choose more than 8 levels");
 		}
 
 		String message = Constants.newGameMessage + String.join(",", levelsList);
@@ -88,7 +88,7 @@ public abstract class MetaAgent {
 		System.out.println(message);
 		MyLogger.log(message);
 
-//		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
+		mProxy.mConnectionToServer.write(message.getBytes(StandardCharsets.UTF_8));
 		byte[] configureResult = configure(Utils.intToByteArray(1000));
 		mProxy.setConfigureResult(configureResult);
 		getMyScore();// getMyScore waits for "start" button to be clicked on the server window
@@ -398,6 +398,10 @@ public abstract class MetaAgent {
 				mCurrentLevel = pLevelName;
 				MyLogger.log("loaded level " + level);
 				System.out.println("loaded level " + level);
+				if(this.training) {
+					this.extractFeatures(pLevelName);
+				}
+
 			} else {
 				MyLogger.log("failed to load level " + level);
 				System.err.println("failed to load level " + level);

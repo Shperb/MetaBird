@@ -19,7 +19,7 @@ public class MetaAgentDynamicProgramming extends MetaAgent {
 	private String[] mChoice = null;
 
 	public MetaAgentDynamicProgramming(int pTimeConstraint, String[] pAgents) {
-		super(pTimeConstraint, pAgents);
+		super(pTimeConstraint, pAgents, false);
 	}
 
 //	@Override

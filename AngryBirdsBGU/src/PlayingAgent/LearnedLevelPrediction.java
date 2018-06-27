@@ -1,6 +1,8 @@
 package PlayingAgent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
 
 import DB.Features;
 
@@ -19,6 +21,7 @@ public class LearnedLevelPrediction extends LevelPrediction {
                 long maxScore = features.getMaxScore();
                 agents.forEach(agent -> {
                     double[] scoreBucketDistribution = ScorePredictionModel.getInstance().predict(agent, features);
+					System.out.println(String.format("Score distribution for agent %s for level %s is " + Arrays.toString(scoreBucketDistribution), agent, this.level));
                     LearnedTimeDistribution timeDistribution = TimePredictionModel.getInstance().predict(agent, features);
                     this.agentsPrediction.put(agent, new AgentLevelPredictionLearning(maxScore, scoreBucketDistribution, timeDistribution));
                 });

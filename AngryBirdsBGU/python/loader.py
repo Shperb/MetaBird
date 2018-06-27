@@ -19,7 +19,7 @@ class KerasPredict(object):
             'naive': self.modelnaive,
             'ihsev': self.modelihsev,
             'planA': self.modelplanA,
-            'ihsev': self.modelAngryBER,
+            'AngryBER': self.modelAngryBER,
         }.get(x, self.modelnaive)
 
     def predictWithModel (self, stringName, features):

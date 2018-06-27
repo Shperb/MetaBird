@@ -9,7 +9,7 @@ import external.ClientMessageTable;
 
 public class MyConnectionToClient extends MyConnection {
 
-	private final boolean showAgentsCmd = false;
+	private final boolean showAgentsCmd = true;
 
 	public MyConnectionToClient(String pExecutableFileName, ServerSocket pServerSocket) throws IOException {
 		String dir = "c:/temp/" + pExecutableFileName;
@@ -21,7 +21,7 @@ public class MyConnectionToClient extends MyConnection {
 		}
 		System.out.println("Waiting for a client " + pExecutableFileName + " ...");
 		Socket socket = pServerSocket.accept();
-		socket.setSoTimeout(20000);
+		socket.setSoTimeout(60000);
 		System.out.println("Client accepted");
 		mInputStream = socket.getInputStream();
 		mOutputStream = socket.getOutputStream();

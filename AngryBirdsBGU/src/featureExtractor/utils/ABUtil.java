@@ -239,7 +239,7 @@ public class ABUtil {
     // return the area/territory of an object
     public static long ObjectTerritory(ABObject o1)
     {
-        return (o1.x+o1.width)*(o1.y+o1.height);
+        return o1.width * o1.height;
     }
 
 	//Return true if the target can be hit by releasing the bird at the specified release point

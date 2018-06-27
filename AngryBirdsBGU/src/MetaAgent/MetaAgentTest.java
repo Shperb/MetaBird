@@ -7,7 +7,7 @@ public class MetaAgentTest extends MetaAgent {
 
 
 	public MetaAgentTest(int pTimeConstraint, String[] pAgents) {
-		super(pTimeConstraint, pAgents);
+		super(pTimeConstraint, pAgents, false);
 	}
 
 	@Override

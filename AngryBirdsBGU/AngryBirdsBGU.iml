@@ -7,11 +7,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="external" level="project" />
-    <orderEntry type="library" name="ABServer1" level="project" />
-    <orderEntry type="library" name="naive1" level="project" />
-    <orderEntry type="library" name="external1" level="project" />
-    <orderEntry type="library" name="ihsev1" level="project" />
-    <orderEntry type="library" name="ihsev" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/external" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/external" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>

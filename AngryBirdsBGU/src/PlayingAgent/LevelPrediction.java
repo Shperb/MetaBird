@@ -3,6 +3,7 @@ package PlayingAgent;
 import DB.Features;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 
@@ -27,9 +28,9 @@ public abstract class LevelPrediction {
         this.level = level;
     }
 
+
     public abstract void calculateAgentsDistributions(ArrayList<String> agents) throws JsonSyntaxException, IOException;
     
-
     public AgentScoreTimeRate getLevelBestAgent(long remainingTime) {
         Comparator<AgentScoreTimeRate> comparator = new AgentScoreTimeRate.AgentScoreTimeRateComparator();
         System.out.println();

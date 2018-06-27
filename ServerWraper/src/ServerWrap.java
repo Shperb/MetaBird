@@ -68,7 +68,8 @@ public class ServerWrap {
 		proxyToChrome.waitForClients(1);
 		proxyToChrome.send(new ProxyReloadMessage());			
 		closeABServer();
-		new JsonLevelsHandler().copy(pLevels);
+//		new JsonLevelsHandler().copy(pLevels);
+		ExtensionLevelsHandler.copy(pLevels);
 		runABServer();
 		Thread.sleep(10000);// wait for page to load
 		clickStartABServer();		
