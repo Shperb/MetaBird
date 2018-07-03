@@ -139,8 +139,8 @@ public abstract class MetaAgent {
 		return retVal;
 	}
 
-	public void start() throws Exception {
-		mProxy = new Proxy();
+	public void start(int serverport,String serverIp) throws Exception {
+		mProxy = new Proxy(serverport,serverIp);
 		mData = DBHandler.loadData();
 		mProxy.setMetaAgent(this);
 		this.featureExtractor = new FeatureExctractor(this, this.mProxy);
@@ -158,17 +158,17 @@ public abstract class MetaAgent {
 	}
 
 	protected void createNewGameEntry(Date startTime) {
-		mData.games.add(new Game(getAlgorithmName(), mTimeConstraint,startTime));
+		mData.games.add(new Game(getAlgorithmName(), mTimeConstraint, startTime));
 		for (int i = 0; i < mAgents.size(); i++) {
 			getGame().agents.add(mAgents.get(i).getName());
 		}
 		ArrayList<String> levelNames = new ArrayList<>(mLevels.keySet());
 		levelNames.sort(new Comparator<String>() {
-			@Override
-			public int compare(String o1, String o2) {
-				return mLevels.get(o1).compareTo(mLevels.get(o2));
-			}
-		});
+            @Override
+            public int compare(String o1, String o2) {
+                return mLevels.get(o1).compareTo(mLevels.get(o2));
+            }
+        });
 		getGame().levelNames = levelNames;
 	}
 
@@ -450,14 +450,21 @@ public abstract class MetaAgent {
 		try {
 			mServerSocket = new ServerSocket(Constants.clientPort);
 			mServerSocket.setSoTimeout(20000);
+            /*
+            mAgents.parallelStream().forEach(x -> {try {
+                x.start(mServerSocket);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }});
+            */
 			Iterator<Agent> iter = mAgents.iterator();
 			while (iter.hasNext()) {
 				iter.next().start(mServerSocket);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            e.printStackTrace();
+        }
+    }
 
 	public Agent getWorkingAgent() {
 		return mWorkingAgent;

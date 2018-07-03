@@ -9,12 +9,12 @@ public class Proxy {
 	public MyConnectionToServer mConnectionToServer;
 	private byte[] mConfigureResult;
 	private MetaAgent mMetaAgent;
-	
-	public Proxy() throws Exception {
-		mConnectionToServer = new MyConnectionToServer();	
-	}
-	
-	public void setConfigureResult(byte[] pConfigureResult) {
+
+    public Proxy(int serverport, String serverIp) throws Exception {
+        mConnectionToServer = new MyConnectionToServer(serverport,serverIp);
+    }
+
+    public void setConfigureResult(byte[] pConfigureResult) {
 		mConfigureResult = pConfigureResult;
 	}
 	

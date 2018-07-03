@@ -9,11 +9,17 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-
+            String ip;
+            if (args.length == 1){
+                ip = args[0];
+            }
+            else{
+                ip = Constants.serverIp;
+            }
 			
 			new ExtensionLevelsDistributionAgent(6000, new String[] {"planA"
 					, "naive", "AngryBER", "ihsev"
-			}).start();
+			}).start(Constants.serverPort,ip);
 			
 //			new AlgorithmTesterDynamicProgramming(600).test(100);
 			

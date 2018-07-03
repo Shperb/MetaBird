@@ -17,7 +17,7 @@ import java.util.HashMap;
 import com.google.gson.JsonSyntaxException;
 
 public class PlayingAgent extends MetaAgent {
-    private final int NUM_LEVELS = 20;
+    private final int NUM_LEVELS = 4;
     private int numLevelstoExtract;
 
     protected HashMap<Integer, LevelPrediction> levelPredictions = new HashMap<>();
@@ -98,8 +98,8 @@ public class PlayingAgent extends MetaAgent {
     protected Date selectLevels() throws JsonSyntaxException, IOException {
         byte[] configureResult = configure(Utils.intToByteArray(1000));
         mProxy.setConfigureResult(configureResult);
-        numLevelstoExtract = configureResult[2];
-        mTimeConstraint = configureResult[1]*60;
+        numLevelstoExtract = (numLevelstoExtract > 20)? 4 : numLevelstoExtract;
+        mTimeConstraint = (configureResult[1] > 0)? configureResult[1]*60 : 10000*60;
         getMyScore();// getMyScore waits for "start" button to be clicked on the server window
         Date startTime = Clock.getClock().getDate();
         

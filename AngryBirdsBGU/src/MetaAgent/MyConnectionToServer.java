@@ -5,10 +5,10 @@ public class MyConnectionToServer extends MyConnection{
 
 	private Socket communicationWithServerSocket;
 
-	public MyConnectionToServer() throws Exception {
-		communicationWithServerSocket = new Socket(Constants.serverIp, Constants.serverPort);
-		mOutputStream = communicationWithServerSocket.getOutputStream();
-		mInputStream = communicationWithServerSocket.getInputStream();		
-	}
-
+    public MyConnectionToServer(int serverport, String serverIp) throws Exception{
+        super();
+        communicationWithServerSocket = new Socket(serverIp, serverport);
+        mOutputStream = communicationWithServerSocket.getOutputStream();
+        mInputStream = communicationWithServerSocket.getInputStream();
+    }
 }

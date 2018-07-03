@@ -31,8 +31,8 @@ public class DistributionExtraction {
 	protected FeaturesData mfeaturesData;
 	protected List<String> mAgents;
 	protected List<String> mLevels;
-	private double[] mFeaturesWeights = null;
-	
+	private double[] mFeaturesWeights = {0.003444204,0.03755201,5.87E-04,2.60E-04,0.001665374,3.37E-04,1.41E-04,0.230511793,0.093466285,0.001918344,2.06E-04,0.001332637,6.85E-05,0.001909205,0.206156629,7.24E-04,0.010143009,1.22E-04,5.90E-06,0.037211744,5.85E-04,8.42E-05,3.90E-04,5.02E-06,0.014059144,2.24E-04,4.69E-05,0.051840713,0.106362764};
+
 	public DistributionExtraction(List<String> agents) throws JsonSyntaxException, IOException {
 		FeaturesData featuresData = DBHandler.loadFeatures();
 		mfeaturesData = featuresData;
@@ -147,6 +147,9 @@ public class DistributionExtraction {
 				if (level.name.equals(pLevel) && level.agent.equals(agent) && level.isFinished()) {
 					retVal.add(pExtractor.getValue(level));
 				}
+                else if(level.name.equals(pLevel.replace(".json","")) && level.agent.equals(agent) && level.isFinished()){
+                    retVal.add(pExtractor.getValue(level));
+                }
 			});
 		});
 		return retVal;
