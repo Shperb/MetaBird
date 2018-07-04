@@ -99,8 +99,8 @@ public class PlayingAgent extends MetaAgent {
         byte[] configureResult = configure(Utils.intToByteArray(1000));
         mProxy.setConfigureResult(configureResult);
         totalNumOfLevels = configureResult[2];
-        totalNumOfLevels = (totalNumOfLevels > 20)? 4 : totalNumOfLevels;
-        mTimeConstraint = (configureResult[1] > 0)? configureResult[1]*60 : 10000*60;
+        totalNumOfLevels = (totalNumOfLevels > 20)? 8 : totalNumOfLevels;
+        mTimeConstraint = (configureResult[1] > 0)? configureResult[1]*60 : 30*60;
         getMyScore();// getMyScore waits for "start" button to be clicked on the server window
         Date startTime = Clock.getClock().getDate();
         
