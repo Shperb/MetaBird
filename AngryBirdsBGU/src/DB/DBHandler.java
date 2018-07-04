@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import MetaAgent.Constants;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -72,7 +73,7 @@ public class DBHandler {
 	}
 
 	public static File getFile(String fileName) throws IOException {
-		String dirName = "c:/MetaAgentDB/";
+		String dirName = Constants.dataDir;
 		String FileName = dirName + fileName;
 		File dir = new File(dirName);
 		if (!dir.exists()) {

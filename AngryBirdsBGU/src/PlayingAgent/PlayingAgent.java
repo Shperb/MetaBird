@@ -17,8 +17,8 @@ import java.util.HashMap;
 import com.google.gson.JsonSyntaxException;
 
 public class PlayingAgent extends MetaAgent {
-    private final int NUM_LEVELS = 4;
-    private int numLevelstoExtract;
+    private final int NUM_LEVELS_TO_EXTRACT = 8;
+    private int totalNumOfLevels;
 
     protected HashMap<Integer, LevelPrediction> levelPredictions = new HashMap<>();
     protected int currLevel = 1;
@@ -43,13 +43,13 @@ public class PlayingAgent extends MetaAgent {
         this.levelPredictions.get(level).updateScore(score, agentName);
 
         // Extract features for more levels if needed
-        if (currLevel > NUM_LEVELS) {
+        if (currLevel > totalNumOfLevels) {
             return;
         }
         this.levelsPlayedSinceFeatureExtraction++;
         if (this.levelsPlayedSinceFeatureExtraction >= numOfNewLevelsExtracted) {
             this.levelsPlayedSinceFeatureExtraction = 0;
-            extractFeaturesForNextLevels(numLevelstoExtract / 2);
+            extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT / 2);
             caculateAgentsLevelDistributions();
         }
     }
@@ -98,7 +98,8 @@ public class PlayingAgent extends MetaAgent {
     protected Date selectLevels() throws JsonSyntaxException, IOException {
         byte[] configureResult = configure(Utils.intToByteArray(1000));
         mProxy.setConfigureResult(configureResult);
-        numLevelstoExtract = (numLevelstoExtract > 20)? 4 : numLevelstoExtract;
+        totalNumOfLevels = configureResult[2];
+        totalNumOfLevels = (totalNumOfLevels > 20)? 4 : totalNumOfLevels;
         mTimeConstraint = (configureResult[1] > 0)? configureResult[1]*60 : 10000*60;
         getMyScore();// getMyScore waits for "start" button to be clicked on the server window
         Date startTime = Clock.getClock().getDate();
@@ -107,7 +108,7 @@ public class PlayingAgent extends MetaAgent {
             this.featureExtractor = new FeatureExctractor(this, super.mProxy);
         }
 
-        extractFeaturesForNextLevels(numLevelstoExtract);
+        extractFeaturesForNextLevels(NUM_LEVELS_TO_EXTRACT);
         caculateAgentsLevelDistributions();
         return startTime;
     }
@@ -125,7 +126,7 @@ public class PlayingAgent extends MetaAgent {
         this.numOfNewLevelsExtracted = 0;
         int firstLevelForFeatureExtraction = currLevel;
         for (; currLevel < firstLevelForFeatureExtraction + numLevelsToExtract; currLevel++) {
-            if (currLevel > NUM_LEVELS) {
+            if (currLevel > totalNumOfLevels) {
                 return;
             }
             String pLevelName = String.valueOf(currLevel);

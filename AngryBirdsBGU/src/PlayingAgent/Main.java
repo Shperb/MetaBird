@@ -85,18 +85,21 @@ public class Main {
 //            }
 //        }
 //
-        /*
+
        try {
           new PerformanceProfilePlayingAgent(pTimeConstraint, pAgents).start(Constants.serverPort, ip);
        } catch (EndGameException e) {
            results[4] = e.getGameResult();
        }
-        */
+
+        /*
         try {
             new PlayingAgent(pTimeConstraint, pAgents).start(Constants.serverPort, ip);
         } catch (EndGameException e) {
             results[4] = e.getGameResult();
         }
+        */
+
 //        for(int i = 0; i < pAgents.length; i++){
 //            System.out.println("*********************************************************************");
 //            System.out.println("Total Score of " + pAgents[i] + " is: " + results[i].getTotalScore());

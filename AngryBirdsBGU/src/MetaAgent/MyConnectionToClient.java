@@ -12,7 +12,7 @@ public class MyConnectionToClient extends MyConnection {
 	private final boolean showAgentsCmd = true;
 
 	public MyConnectionToClient(String pExecutableFileName, ServerSocket pServerSocket) throws IOException {
-		String dir = "c:/temp/" + pExecutableFileName;
+		String dir = Constants.AgentsDir + pExecutableFileName;
 		if(showAgentsCmd){
 			Runtime.getRuntime().exec("cmd /c start " + dir + "/" + pExecutableFileName + ".bat", null, new File(dir));
 		}

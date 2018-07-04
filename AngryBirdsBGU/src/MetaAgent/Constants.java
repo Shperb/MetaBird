@@ -20,8 +20,12 @@ public class Constants {
 			add(ClientMessageTable.shootSeq);
 		}
 	};
-	public static final int maxLevel = 21;
-	public static final String logFilePath =  "c:/temp/MetaAgent.log";
-	public static final String levelsDir = "C:/temp/Ai-birds/Levels";
-	protected static String newGameMessage = "new game";
+    public static final String BaseDir = System.getProperty("user.dir");
+    public static final int maxLevel = 21;
+	public static final String logFilePath =  BaseDir + "/MetaAgent.log";
+    public static final String AgentsDir =  BaseDir + "/agents/";
+    public static final String levelsDir = BaseDir + "/Ai-birds/Levels";
+    public static final String dataDir = BaseDir + "/MetaAgentDB/";
+
+    protected static String newGameMessage = "new game";
 }

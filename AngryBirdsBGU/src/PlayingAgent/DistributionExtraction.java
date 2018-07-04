@@ -205,6 +205,46 @@ public class DistributionExtraction {
 		}
 		return maxValues;		
 	}
+    private HashMap<String,Double> computeDistanceFromEachLevelUsingFeatures(List<Double> features, int k, boolean pNormalize){
+        HashMap<String,Double> result = new HashMap<>();
+        double sumOfDistances = 0;
+        PriorityQueue<LevelDistance> distancePriotiryQueue =new PriorityQueue<LevelDistance>();
+        List<Double> maxValues = getMaxFeaturesValues();
+	/*	for (String level : featureSet.keySet()) {
+			double currentDistance = computeDistance(featureSet.get(level),features,maxValues);
+			distancePriotiryQueue.add(new LevelDistance(currentDistance, level));
+			double toAdd = 1/(currentDistance+epsilon);
+			sumOfDistances += toAdd;
+			result.put(level,toAdd);
+		}*/
+        for (String level : mLevelFeatures.keySet()) {
+            double currentDistance = computeDistance(mLevelFeatures.get(level),features, maxValues);
+            distancePriotiryQueue.add(new LevelDistance(currentDistance, level));
+        }
+        int count = 0;
+        LevelDistance pair;
+        while (count < k){
+            pair = distancePriotiryQueue.poll();
+            if (pair == null){
+                break;
+            }
+            else{
+                double toAdd = 1/(pair.getDistance()+epsilon);
+                result.put(pair.getLevel(),toAdd);
+                sumOfDistances += toAdd;
+                count++;
+            }
+
+        }
+
+        if (pNormalize) {
+            for (String level : result.keySet()) {
+                    result.put(level,result.get(level) / sumOfDistances);
+            }
+        }
+        return result;
+
+    }
 	
 	private HashMap<String,Double> computeDistanceFromEachLevel(String currlevel, int k, double currProb, boolean pNormalize){
 		HashMap<String,Double> result = new HashMap<>();
@@ -294,8 +334,36 @@ public class DistributionExtraction {
 		}
 		return results;
 	}
-			
-	private HashMap<String, HashMap<String, Distribution>> getDistribution(HashMap<String, HashMap<String, ArrayList<Integer>>> pValues,boolean isScore) {
+
+    protected HashMap<String, Distribution> getDistributionFromFeatures(int k,boolean isBinned,boolean isScore,List<Double> features,double maxScore){
+        HashMap<String, HashMap<String, Distribution>> distributions = isScore? getRealScoreDistribution() : getRealTimeDistribution();
+        HashMap<String, Distribution> results = new HashMap<String,Distribution>();
+        for (String agent : mAgents){
+            HashMap<String, Distribution> agentDistribution = distributions.get(agent);
+            HashMap<String,Double> distance = computeDistanceFromEachLevelUsingFeatures(features, k, true);
+            HashMap<NamedDistribution,Double> distributionOfDistributions = new HashMap<NamedDistribution, Double>();
+            for (String lvl : distance.keySet()){
+
+                distributionOfDistributions.put(new NamedDistribution(lvl,agentDistribution.get(lvl)), distance.get(lvl));
+            }
+            if (isBinned){
+                results.put(agent, new BinnedDistributionOfDistributions(distributionOfDistributions,maxScore));
+
+            }
+            else{
+                results.put(agent, new DistributionOfDistributions(distributionOfDistributions,maxScore));
+            }
+        }
+        return results;
+
+    }
+    protected HashMap<String, Distribution> getDistributionFromFeatures(boolean isBinned,boolean isScore,List<Double> features,double maxScore){
+        return getDistributionFromFeatures(mLevels.size(),isBinned,isScore,features,maxScore);
+
+    }
+
+
+            private HashMap<String, HashMap<String, Distribution>> getDistribution(HashMap<String, HashMap<String, ArrayList<Integer>>> pValues,boolean isScore) {
 		HashMap<String, HashMap<String, Distribution>> retVal = new HashMap<>();
 		for(String agent : mAgents){
 			HashMap<String, Distribution> agentMap = new HashMap<String, Distribution>();
