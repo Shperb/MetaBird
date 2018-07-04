@@ -48,13 +48,16 @@ public abstract class LevelPrediction {
 
     public void updateScore(int score, String agentName) {
         // TODO: It is possible, if the agent did not improve the score, to "punish" his score/time rate fot this level
-        this.currentScore = Math.max(currentScore, score);
-        Map<String,Double> levelProfileProbabilities= agentsPrediction.get(agentName).updateProbability(score);
+        ScoreTimeRateCalculator scoreTimeRateCalculator = agentsPrediction.get(agentName);
+        scoreTimeRateCalculator.reportResult(score > this.currentScore);
+        Map<String,Double> levelProfileProbabilities= scoreTimeRateCalculator.updateProbability(score);
         if (levelProfileProbabilities != null) {
             for (ScoreTimeRateCalculator calc : agentsPrediction.values()) {
                 calc.setProbability(levelProfileProbabilities);
             }
         }
+
+        this.currentScore = Math.max(this.currentScore, score);
     }
 
     public String getLevel() {

@@ -30,6 +30,15 @@ public class AgentLevelPredictionLearning extends AgentLevelPrediction {
 
 	}
 
+    @Override
+    public double getScoreTimeRate(long remainingTime, int currentScore) {
+        double probabilityBelowRemainingTime = this.predictedTime.getProbabilityBelowValue(remainingTime);
+        double scoreTimeRate = getExpectationTimesProbablityAboveScore(currentScore) * probabilityBelowRemainingTime
+                / this.predictedTime.getExpectationBelowValue(remainingTime)
+                / Math.pow(1.1, this.numTimesFailed);
+        return scoreTimeRate;
+    }
+
 	@Override
 	public Map<String, Double> updateProbability(int score) {
         return null;
