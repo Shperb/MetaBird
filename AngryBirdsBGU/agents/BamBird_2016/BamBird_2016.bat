@@ -1,0 +1,1 @@
+java -jar BamBird.jar localhost 1111 "C:\Program Files\swipl\bin\swipl-win.exe" 1
