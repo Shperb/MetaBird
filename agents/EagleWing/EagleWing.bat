@@ -1,1 +1,1 @@
-java -jar AI-AngryBird-Eagle-Wing-master.jar -nasc
+java -jar AI-AngryBird-Eagle-Wing-master.jar localhost
