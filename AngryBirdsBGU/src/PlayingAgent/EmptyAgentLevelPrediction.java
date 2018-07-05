@@ -17,4 +17,9 @@ public class EmptyAgentLevelPrediction implements ScoreTimeRateCalculator {
     @Override
     public void setProbability(Map<String, Double> levelProfileProbabilities) {
     }
+
+    @Override
+    public void reportResult(boolean didPassCurrentScore) {
+
+    }
 }
