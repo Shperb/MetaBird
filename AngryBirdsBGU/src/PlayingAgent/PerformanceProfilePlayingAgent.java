@@ -1,6 +1,7 @@
 package PlayingAgent;
 
 import DB.Features;
+import MetaAgent.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class PerformanceProfilePlayingAgent extends PlayingAgent {
 	public PerformanceProfilePlayingAgent(int pTimeConstraint, String[] pAgents) {
         super(pTimeConstraint, pAgents);
         try {
-            de = new DistributionExtraction(new ArrayList<>(Arrays.asList("planA,naive,AngryBER,ihsev".split(","))));
+            de = new DistributionExtraction(new ArrayList<>(Arrays.asList(Constants.LIST_OF_AGENTS.split(","))));
         } catch (IOException e) {
             e.printStackTrace();
         }

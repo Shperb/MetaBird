@@ -15,20 +15,15 @@ import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String[] pAgents = {
-                "planA",
-                "naive",
-                "AngryBER",
-                "ihsev"
-        };
+        String[] pAgents = Constants.LIST_OF_AGENTS.split(",");
 
-        String ip;
+        String ip = Constants.serverIp;
+        int serverPort = Constants.serverPort;
         if (args.length == 1){
             ip = args[0];
+            serverPort = 2004;
         }
-        else{
-            ip = Constants.serverIp;
-        }
+
 /*
         Data merged = new Data();
         for (int i=1; i<=6; i++) {
@@ -87,7 +82,7 @@ public class Main {
 //
 
        try {
-          new PerformanceProfilePlayingAgent(pTimeConstraint, pAgents).start(Constants.serverPort, ip);
+          new PerformanceProfilePlayingAgent(pTimeConstraint, pAgents).start(serverPort, ip);
        } catch (EndGameException e) {
            results[4] = e.getGameResult();
        }

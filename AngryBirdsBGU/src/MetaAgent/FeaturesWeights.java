@@ -16,11 +16,11 @@ public class FeaturesWeights {
     public void findMetricForLevels() throws Exception {
         FeaturesData featuresData = DBHandler.loadFeatures();
 
-        mDe = new DistributionExtraction(new ArrayList<>(Arrays.asList("planA,naive,AngryBER,ihsev".split(","))));
+        mDe = new DistributionExtraction(new ArrayList<>(Arrays.asList(Constants.LIST_OF_AGENTS.split(","))));
 
         int numberOfRepetition = 10000;
         Problem problem = new Problem();
-        ArrayList<String> AgentList = new ArrayList<String>(Arrays.asList("planA,naive,AngryBER,ihsev".split(",")));
+        ArrayList<String> AgentList = new ArrayList<String>(Arrays.asList(Constants.LIST_OF_AGENTS.split(",")));
 
        // problem.agents = new ArrayList<>(Arrays.asList("planA,naive,AngryBER,ihsev".split(",")));
        // problem.timeConstraint = 200;
@@ -81,7 +81,7 @@ public class FeaturesWeights {
     private double getDistanceFromGoalFunction(double[] pFeaturesWeights, Set<String> bankForIteration) {
         mDe.setFeaturesWeights(pFeaturesWeights);
         double error = 0;
-        ArrayList<String> AgentList = new ArrayList<String>(Arrays.asList("planA,naive,AngryBER,ihsev".split(",")));
+        ArrayList<String> AgentList = new ArrayList<String>(Arrays.asList(Constants.LIST_OF_AGENTS.split(",")));
         for (String level1 : bankForIteration) {
             for (String level2 : bankForIteration) {
                 for (String agent : AgentList) {

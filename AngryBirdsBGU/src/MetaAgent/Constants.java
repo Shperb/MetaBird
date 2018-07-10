@@ -8,6 +8,7 @@ public class Constants {
 	public final static String serverIp = "localhost";
 	public final static int serverPort = 2018;
 	public final static int clientPort = 2004;
+    public final static String LIST_OF_AGENTS = "planA,AngryBER,ihsev,EagleWing";
 	protected static long timeToTerminateAgentMilis = 3 * 60 * 1000;
 	public static HashSet<ClientMessageTable> shotsMessages = new HashSet<ClientMessageTable>() {
 		private static final long serialVersionUID = 1L;

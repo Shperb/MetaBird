@@ -17,9 +17,7 @@ public class Main {
                 ip = Constants.serverIp;
             }
 			
-			new ExtensionLevelsDistributionAgent(6000, new String[] {"planA"
-					, "naive", "AngryBER", "ihsev"
-			}).start(Constants.serverPort,ip);
+			new ExtensionLevelsDistributionAgent(6000, Constants.LIST_OF_AGENTS.split(",")).start(Constants.serverPort,ip);
 			
 //			new AlgorithmTesterDynamicProgramming(600).test(100);
 			
