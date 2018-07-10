@@ -42,6 +42,16 @@ public class FeaturesData {
         return max;
     }
 
+    public double getNumOfBirds(String level){
+        double numOfBirds = 0;
+        List<Features> levelFeatures = features.get(level);
+        for (Features feature : levelFeatures){
+            double currentValue = feature.numBirds;
+            numOfBirds += currentValue / levelFeatures.size();
+        }
+        return numOfBirds;
+    }
+
     public static <T> T majority (List<T> lst) {
         Map<T, Integer> map = new HashMap<T, Integer>();
         for (T obj : lst) {

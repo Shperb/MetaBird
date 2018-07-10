@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="external/commons-codec-1.7.jar"/>
+	<classpathentry kind="lib" path="external/Jama-1.0.2.jar"/>
+	<classpathentry kind="lib" path="external/jbox2d-library-2.2.1.1.jar"/>
+	<classpathentry kind="lib" path="external/jbox2d-serialization-1.1.0.jar"/>
+	<classpathentry kind="lib" path="external/jbox2d-testbed-2.2.1.1.jar"/>
+	<classpathentry kind="lib" path="external/jbox2d-testbed-jogl-1.0.1.jar"/>
+	<classpathentry kind="lib" path="external/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="external/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="external/slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="external/slf4j-log4j12-1.7.5.jar"/>
+	<classpathentry kind="lib" path="external/WebSocket.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

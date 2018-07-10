@@ -9,10 +9,7 @@ import featureExtractor.demo.FeatureExctractor;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -97,6 +94,7 @@ public class PlayingAgent extends MetaAgent {
     @Override
     protected Date selectLevels() throws JsonSyntaxException, IOException {
         byte[] configureResult = configure(Utils.intToByteArray(1000));
+        System.out.println("configure: " + Arrays.toString(configureResult));
         mProxy.setConfigureResult(configureResult);
         totalNumOfLevels = configureResult[2];
         totalNumOfLevels = (totalNumOfLevels > 20)? 8 : totalNumOfLevels;

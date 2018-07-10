@@ -110,12 +110,12 @@ public class Main {
 //            System.out.println("*********************************************************************");
 //        }
 //
-//        System.out.println("*********************************************************************");
-//        System.out.println("Total Score of metaAgent is: " + results[4].getTotalScore());
-//        results[4].getLevelScores().forEach(
-//                (l, score) ->
-//                        System.out.println(String.format("Score for level %d is: %d", l, score))
-//        );
-//        System.out.println("*********************************************************************");
+        System.out.println("*********************************************************************");
+        System.out.println("Total Score of metaAgent is: " + results[4].getTotalScore());
+        results[4].getLevelScores().forEach(
+                (l, score) ->
+                        System.out.println("Score for level " + l +"is: " + score)
+        );
+        System.out.println("*********************************************************************");
     }
 }

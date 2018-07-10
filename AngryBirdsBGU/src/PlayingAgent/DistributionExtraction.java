@@ -370,7 +370,7 @@ public class DistributionExtraction {
 			retVal.put(agent, agentMap);
 			HashMap<String, Distribution> agentDistribution = retVal.get(agent);
 			for (String level : pValues.get(agent).keySet()){
-				double maxValue = isScore ? mfeaturesData.computeMaxScoreBasedOnFeatures(level) : 300;
+				double maxValue = isScore ? mfeaturesData.computeMaxScoreBasedOnFeatures(level) : mfeaturesData.getNumOfBirds(level);
 				ImplicitDistribution dist = new ImplicitDistribution(maxValue);
 				agentDistribution.put(level, dist);
 				for (Integer v : pValues.get(agent).get(level)){
