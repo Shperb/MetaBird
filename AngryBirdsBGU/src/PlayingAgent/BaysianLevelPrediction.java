@@ -28,7 +28,7 @@ public class BaysianLevelPrediction extends LevelPrediction {
                 long maxScore = features.getMaxScore();
                 List<Double> listOfFeatures = features.getFeatureAsList();
                 HashMap<String, Distribution> scoreDistribution  = de.getDistributionFromFeatures(true, true, listOfFeatures, maxScore);
-                HashMap<String, Distribution> timeDistribution  = de.getDistributionFromFeatures(false,false,listOfFeatures,maxScore);
+                HashMap<String, Distribution> timeDistribution  = de.getDistributionFromFeatures(false,false,listOfFeatures,features.numBirds);
                 agents.forEach(agent -> {
                 	this.agentsPrediction.put(agent, new BaysianAgentLevelPrediction(scoreDistribution.get(agent),timeDistribution.get(agent),maxScore));
                 });

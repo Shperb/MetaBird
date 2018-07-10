@@ -64,7 +64,9 @@ public class BinnedDistributionOfDistributions extends Distribution{
 	public double getExpectation(long pSubstract) {
 		double retVal = 0;
 		for (Integer val : getSupport()){
-			retVal += getLikelihood(val)*val;
+			if (val > pSubstract){
+				retVal += getLikelihood(val)*(val - pSubstract);
+			}
 		}
 		return retVal;
 	}
