@@ -2,6 +2,7 @@ package PlayingAgent;
 
 import Clock.Clock;
 import DB.Features;
+import DB.LevelState;
 import MetaAgent.*;
 import ab.vision.GameStateExtractor;
 import external.ClientMessageTable;
@@ -30,14 +31,14 @@ public class PlayingAgent extends MetaAgent {
     }
 
     @Override
-    protected void actAfterLevelFinished(String plevelName, String agentName, int score)  throws JsonSyntaxException, IOException{
+    protected void actAfterLevelFinished(String plevelName, String agentName, int score, LevelState state)  throws JsonSyntaxException, IOException{
         int currScore = this.levelScores.getOrDefault(plevelName, 0);
         if (score >= currScore) {
             this.levelScores.put(plevelName, score);
             this.levelsBestAgent.put(plevelName, agentName);
         }
         int level = Integer.valueOf(plevelName);
-        this.levelPredictions.get(level).updateScore(score, agentName);
+        this.levelPredictions.get(level).updateScore(score, agentName,state);
 
         // Extract features for more levels if needed
         if (currLevel > totalNumOfLevels) {

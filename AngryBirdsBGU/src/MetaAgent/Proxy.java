@@ -27,16 +27,16 @@ public class Proxy {
 				boolean deliverd = false;
 				try {
 					deliverd = deliverMessageFromClient(refMessage);
-				} catch (ClientConnectionException e) {
-					e.printStackTrace();
-					MyLogger.log(e);
-					mMetaAgent.handleClientConnectionError();
-				}
 					mMetaAgent.actBeforeServerResponse((byte[])(refMessage[0]));
 					if (deliverd) {
 						deliverMessageFromServer();
 					}
 					mMetaAgent.actAfterServerResponse((byte[])(refMessage[0]));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    MyLogger.log(e);
+                    mMetaAgent.handleClientConnectionError();
+                }
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

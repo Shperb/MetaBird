@@ -4,6 +4,7 @@ import DB.Features;
 import java.io.IOException;
 import java.util.*;
 
+import DB.LevelState;
 import com.google.gson.JsonSyntaxException;
 
 public abstract class LevelPrediction {
@@ -46,11 +47,11 @@ public abstract class LevelPrediction {
                 : new AgentScoreTimeRate(level, agents.get(0), 0);
     }
 
-    public void updateScore(int score, String agentName) {
+    public void updateScore(int score, String agentName, LevelState state) {
         // TODO: It is possible, if the agent did not improve the score, to "punish" his score/time rate fot this level
         this.currentScore = Math.max(currentScore, score);
         Map<String,Double> levelProfileProbabilities= agentsPrediction.get(agentName).updateProbability(score);
-        if (levelProfileProbabilities != null) {
+        if (levelProfileProbabilities != null && (state == LevelState.won || state == LevelState.lost)) {
             for (ScoreTimeRateCalculator calc : agentsPrediction.values()) {
                 calc.setProbability(levelProfileProbabilities);
             }

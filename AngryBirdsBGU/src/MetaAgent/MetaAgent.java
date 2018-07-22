@@ -54,7 +54,7 @@ public abstract class MetaAgent {
 		return new GameResult(totalScore, this.levelScores, this.levelsBestAgent);
 	}
 
-	protected void actAfterLevelFinished(String plevelName, String agentName, int score) throws JsonSyntaxException, IOException {
+	protected void actAfterLevelFinished(String plevelName, String agentName, int score, LevelState state) throws JsonSyntaxException, IOException {
 		int currScore = this.levelScores.getOrDefault(plevelName, 0);
 		if(score > currScore){
 			this.levelScores.put(plevelName, score);
@@ -244,7 +244,7 @@ public abstract class MetaAgent {
 			}
 			getLevel().setEndTime();
 			DBHandler.saveData(mData);
-			actAfterLevelFinished(this.mCurrentLevel, this.mWorkingAgent.getName(), score);
+			actAfterLevelFinished(this.mCurrentLevel, this.mWorkingAgent.getName(), score,getLevel().state);
 			System.out.println("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
 					+ getTimeConstraint());
 			MyLogger.log("getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
@@ -478,6 +478,11 @@ public abstract class MetaAgent {
 		getLevel().state = LevelState.connection_error;
 		getLevel().setEndTime();
 		DBHandler.saveData(mData);
+        actAfterLevelFinished(this.mCurrentLevel, this.mWorkingAgent.getName(), 0, LevelState.connection_error);
+        System.out.println("Agent failed with exception. getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
+                + getTimeConstraint());
+        MyLogger.log("Agent failed with exception. getGame().getTimeElapsed(): " + getGame().getTimeElapsed() + ", getTimeConstraint(): "
+                + getTimeConstraint());
 
 		chooseAgentAndLevel();
 	}
